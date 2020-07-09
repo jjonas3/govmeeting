@@ -30,4 +30,5 @@ export class EditTranscriptComponent implements OnInit {
         this.showhidehelp = this.showhelp ? "Show" : "Hide";
         this.showhelp = !this.showhelp;
     }
+
 }

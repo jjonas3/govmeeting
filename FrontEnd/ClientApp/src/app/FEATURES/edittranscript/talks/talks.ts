@@ -1,6 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, NgZone } from '@angular/core';
 import { EdittranscriptService } from '../edittranscript.service';
 import { EditTranscript, Talk, Word } from '../../../MODELS/edittranscript-view';
+import { CdkTextareaAutosize } from '@angular/cdk/text-field';
+import { DemoMaterialModule } from '../../../COMMON/material';
+import {take} from 'rxjs/operators';
+
 
 const NoLog = true;  // set to false for console logging
 
@@ -18,6 +22,17 @@ export class TalksComponent implements OnInit {
   topics: string[];
   highlightedTopic: string;
   shownTopicSelection: number = -1; // index of where we are displaying topic choice.
+  scrollText: HTMLElement;
+
+  @ViewChild('autosize', { static: true }) autosize: CdkTextareaAutosize;
+
+  triggerResize() {
+    // Wait for changes to be applied, then trigger textarea resize.
+    this._ngZone.onStable.pipe(take(1))
+        .subscribe(() => this.autosize.resizeToFitContent(true));
+  }
+
+
 
   wordColor: string = "lightgreen";
 
@@ -31,7 +46,7 @@ export class TalksComponent implements OnInit {
      }
     }
 
-    constructor(private _edittranscriptService: EdittranscriptService) {
+    constructor(private _edittranscriptService: EdittranscriptService, private _ngZone: NgZone) {
         //this.talks = addtagsService.getTalks();
     }
 
@@ -42,6 +57,8 @@ export class TalksComponent implements OnInit {
   ngOnInit() {
     NoLog || console.log(this.ClassName + 'ngOnInit');
     this.getTalks();
+    this.scrollText = <HTMLElement>document.getElementById('scrolltext');
+    // this.getListInfo();
 
       // The following would get the list in memory.
       // this.talks = this._talkService.getTalksFromMemory();
@@ -150,5 +167,19 @@ export class TalksComponent implements OnInit {
           }
       }
   }
+
+  //////////////////// Handle Scrolling /////////////////////////
+
+  // centerTarget(item: Section){
+  centerTarget(section: string){
+    // let section = 'section' + item.id;
+    const elem: HTMLElement = <HTMLElement>document.querySelector('#' + section);
+    let itemOffsetTop = elem.offsetTop;
+    let listOffsetTop = this.scrollText.offsetTop;
+    let listOffsetHeight = this.scrollText.offsetHeight;
+    this.scrollText.scrollTop = itemOffsetTop - listOffsetTop - listOffsetHeight / 2;
+  }
+
+
 
 }
