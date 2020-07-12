@@ -23,8 +23,8 @@ import {SidenavMenuComponent} from './sidenav-menu';
 import { NavService } from './nav.service';
 import { TopNavComponent } from './sidenav-header/sidenav-header';
 
-@NgModule({
-  exports: [
+// @NgModule({
+//   exports: [
     // CDK
     // A11yModule,
     // BidiModule,
@@ -36,16 +36,17 @@ import { TopNavComponent } from './sidenav-header/sidenav-header';
     // CdkStepperModule,
     // CdkTableModule,
 
-    DemoMaterialModule
-  ]
-})
+//     DemoMaterialModule
+//   ]
+// })
 export class MaterialModule {}
 
 @NgModule({
   imports: [
     BrowserModule,
     CommonModule,
-    MaterialModule,
+    DemoMaterialModule,
+    // MaterialModule,
     FormsModule,
     ReactiveFormsModule,
     BrowserAnimationsModule,          // TODO This is also imported in dashboard.module & app.module. Choose which we need.

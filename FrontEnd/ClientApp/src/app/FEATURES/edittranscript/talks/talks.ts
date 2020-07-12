@@ -2,7 +2,6 @@ import { Component, OnInit, ViewChild, NgZone } from '@angular/core';
 import { EdittranscriptService } from '../edittranscript.service';
 import { EditTranscript, Talk, Word } from '../../../MODELS/edittranscript-view';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
-import { DemoMaterialModule } from '../../../COMMON/material';
 import {take} from 'rxjs/operators';
 
 
