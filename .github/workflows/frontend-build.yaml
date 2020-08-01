@@ -36,7 +36,9 @@ jobs:
       - name: npm install and npm run build
         run: |
           npm ci
-          npm run build
+          npm run build:ci
+
+      # npm run build
 
       # - name: run jasmine unit tests
       #   run: npm run test:nowatch
