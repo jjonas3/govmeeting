@@ -19,7 +19,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v1
-      
+
       - name: Cache node modules
         uses: actions/cache@v1
         with:
@@ -38,8 +38,8 @@ jobs:
           npm ci
           npm run build
 
-      - name: run jasmine unit tests
-        run: npm run test:nowatch
+      # - name: run jasmine unit tests
+      #   run: npm run test:nowatch
 
       - name: run app and cypress tests
         run: |
