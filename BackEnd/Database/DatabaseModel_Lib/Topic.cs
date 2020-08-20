@@ -15,6 +15,6 @@ namespace GM.DatabaseModel
         public string Name { get; set; }
         public List<TopicDiscussion> TopicDiscussions { get; set; }
         public List<Category> Categories { get; set; }
-        public int GovernmentBodyId { get; set; }
+        public int GovBodyId { get; set; }
     }
 }
