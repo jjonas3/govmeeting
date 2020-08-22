@@ -40,8 +40,14 @@ namespace DatabaseModel_Lib
         /// <summary>
         /// A set of entities under this one (CHI under IL)
         /// </summary>
-        public List<GovEntity> subEntities;
-                
+        // public List<GovEntity> subEntities;
+
+        /// <summary>
+        ///  The parent to this entity
+        /// </summary>
+        GovEntity parentEntity
+
+
 
     }
 }
