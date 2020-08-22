@@ -13,6 +13,6 @@ namespace GM.DatabaseModel
     public class Official : Speaker
     {
         public string Identifier { get; set; }
-        public int GovBodyId { get; set; }
+        public int GovermentBodyId { get; set; }
     }
 }

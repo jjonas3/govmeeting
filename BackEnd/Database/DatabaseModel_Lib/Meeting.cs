@@ -30,7 +30,7 @@ namespace GM.DatabaseModel
         public DateTime Date { get; set; }
         public int Length { get; set; }
         public List<TopicDiscussion> TopicDiscussions { get; set; }
-        public long GovBodyId { get; set; }
+        public long GovermentBodyId { get; set; }
         public string Language { get; set; }
         public string SourceFilename { get; set; }
         public SourceType SourceType { get; set; }
