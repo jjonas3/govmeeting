@@ -45,7 +45,7 @@ namespace DatabaseModel_Lib
         /// <summary>
         ///  The parent to this entity
         /// </summary>
-        GovEntity parentEntity;
+       public  GovEntity ParentEntity { get; set; }
 
 
 
