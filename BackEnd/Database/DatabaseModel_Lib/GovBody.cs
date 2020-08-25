@@ -13,6 +13,10 @@ namespace GM.DatabaseModel
     {
         public long Id { get; set; }
         public string Name { get; set; }
+        public string Country { get; set; }
+        public string County { get; set; }
+        public string State { get; set; }
+        public string Municipality { get; set; }
 
         /// <summary>
         ///  Assuming all GovBodies have a GovEntity as a parent
@@ -30,6 +34,15 @@ namespace GM.DatabaseModel
         {
             Name = name;
             Parent = entityID;
+        }
+
+        public GovBody(string country, string state, string county, string municipality)
+        {
+            County = county;
+            Country = country;
+            State = state;
+            Municipality = municipality;
+
         }
 
     }

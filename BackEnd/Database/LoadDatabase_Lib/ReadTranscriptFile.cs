@@ -65,9 +65,9 @@ namespace GM.LoadDatabase
     /// </summary>
     public class ReadTranscriptFile
     {
-        public GovernmentBody LoadHeadingInfo()
+        public GovBody LoadHeadingInfo()
         {
-            return new GovernmentBody();
+            return new GovBody();
         }
 
         public Meeting LoadMeetingData(List<Category> categories, List<Topic> topics)

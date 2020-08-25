@@ -41,7 +41,7 @@ namespace GM.FileDataRepositories
         {
             try
             {
-                GovernmentBody g = govBodyRepository.Get(meeting.GovernmentBodyId);
+                GovBody g = govBodyRepository.Get(meeting.GovernmentBodyId);
                 language = g.Languages[0].Name;
                 country = g.Country;
                 state = g.State;

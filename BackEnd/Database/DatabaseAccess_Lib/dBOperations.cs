@@ -86,9 +86,9 @@ namespace GM.DatabaseAccess
 
         }
 
-        public GovernmentBody GetGovernmentBody(long governmentBodyId)
+        public GovBody GetGovernmentBody(long governmentBodyId)
         {
-            GovernmentBody gBody;
+            GovBody gBody;
             var query = from g in applicationDbContext.GovernmentBodies
                         where g.Id == governmentBodyId
                         select g;
@@ -100,7 +100,7 @@ namespace GM.DatabaseAccess
         /// Gets the existing government bodies.
         /// </summary>
         /// <returns>list of government bodies</returns>
-        public List<GovernmentBody> GetGovernmentBodies()
+        public List<GovBody> GetGovernmentBodies()
         {
             return applicationDbContext.GovernmentBodies.ToList();
         }
@@ -112,9 +112,9 @@ namespace GM.DatabaseAccess
         /// <param name="govBody">The gov body.</param>
         /// <returns>existing government body already exists in the database, return that one. Otherwise
         /// return null so that call will use the one that was passed to this routine.</returns>
-        public GovernmentBody GetOrAddGovernmentBody(GovernmentBody govBody)
+        public GovBody GetOrAddGovernmentBody(GovBody govBody)
         {
-            GovernmentBody gBody = GetExistingBody(govBody);
+            GovBody gBody = GetExistingBody(govBody);
 
             // If the government body is already in the database, use it.
             if (gBody != null)
@@ -136,9 +136,9 @@ namespace GM.DatabaseAccess
         /// </summary>
         /// <param name="govBody">The gov body.</param>
         /// <returns>existing government body or null.</returns>
-        public GovernmentBody GetExistingBody(GovernmentBody govBody)
+        public GovBody GetExistingBody(GovBody govBody)
         {
-            GovernmentBody gBody;
+            GovBody gBody;
             var query = from g in applicationDbContext.GovernmentBodies
                         where g.Name == govBody.Name
                         && g.Country == govBody.Country

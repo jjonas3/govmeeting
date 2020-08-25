@@ -8,15 +8,15 @@ namespace GM.DatabaseRepositories
 {
     public interface IGovBodyRepository
     {
-        GovernmentBody Get(long govBodyId);
+        GovBody Get(long govBodyId);
         
         long GetIdOfMatching(string country, string state, string county, string municipality);
 
-        long GetIdOfMatching(GovernmentBody govBody);
+        long GetIdOfMatching(GovBody govBody);
 
-        GovernmentBody GetMatching(string country, string state, string county, string municipality);
+        GovBody GetMatching(string country, string state, string county, string municipality);
 
-        GovernmentBody GetMatching(GovernmentBody govBody);
-        long Add(GovernmentBody govBody);
+        GovBody GetMatching(GovBody govBody);
+        long Add(GovBody govBody);
     }
 }

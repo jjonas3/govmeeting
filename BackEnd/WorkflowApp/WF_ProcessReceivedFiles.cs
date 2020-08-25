@@ -70,7 +70,7 @@ namespace GM.Workflow
             }
 
             // Check if there is a database record for this government body.
-            GovernmentBody govBody = new GovernmentBody(
+            GovBody govBody = new GovBody(
                 meetingFolder.country,
                 meetingFolder.state,
                 meetingFolder.county,

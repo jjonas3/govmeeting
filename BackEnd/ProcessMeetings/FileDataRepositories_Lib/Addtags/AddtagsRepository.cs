@@ -61,7 +61,7 @@ namespace GM.FileDataRepositories
         public string GetWorkFolderPath(long meetingId)
         {
             Meeting meeting = meetingRepository.Get(meetingId);
-            GovernmentBody g = govBodyRepository.Get(meeting.GovernmentBodyId);
+            GovBody g = govBodyRepository.Get(meeting.GovernmentBodyId);
             string language = g.Languages[0].Name;
 
             MeetingFolder meetingFolder = new MeetingFolder(g.Country, g.State, g.County, g.Municipality, meeting.Date, g.Name, language);

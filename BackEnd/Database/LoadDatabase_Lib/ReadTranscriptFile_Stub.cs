@@ -7,9 +7,9 @@ namespace GM.LoadDatabase
 {
     class ReadTranscriptFile_Stub
     {
-        public GovernmentBody LoadHeadingInfo()
+        public GovBody LoadHeadingInfo()
         {
-            return new GovernmentBody();
+            return new GovBody();
         }
 
         public Meeting LoadMeetingData(List<Category> categories, List<Topic> topics)
@@ -17,9 +17,9 @@ namespace GM.LoadDatabase
             return new Meeting();
         }
 
-        private List<GovernmentBody> testGovBodies = new List<GovernmentBody>
+        private List<GovBody> testGovBodies = new List<GovBody>
         {
-            new GovernmentBody()
+            new GovBody()
             {
                 Id = 1,
                 Name = "Selectmen",
@@ -29,7 +29,7 @@ namespace GM.LoadDatabase
                 Municipality = "BoothbayHarbor",
                 Languages = new List<Language> {new Language {Id = 1, Name = "en"} }
             },
-            new GovernmentBody()
+            new GovBody()
             {
                 Id = 2,
                 Name = "CityCouncil",

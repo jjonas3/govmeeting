@@ -53,10 +53,10 @@ namespace GM.LoadDatabase
                 List<Category> categories = dbOps.GetCategories();
 
                 // Get the governent body info from the transcipt header
-                GovernmentBody govBody = readTranscript.LoadHeadingInfo();
+                GovBody govBody = readTranscript.LoadHeadingInfo();
                 if (govBody != null)
                 {
-                    GovernmentBody gBody;
+                    GovBody gBody;
                     List<Topic> topics;
                     // See if that government body already exists in the database
                     // If it is present, get the existing topics

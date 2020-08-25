@@ -7,9 +7,9 @@ namespace GM.DatabaseRepositories
 {
     public class GovBodyRepository_Stub : IGovBodyRepository
     {
-    public GovernmentBody Get(long governmentBodyId)
+    public GovBody Get(long governmentBodyId)
     {
-        GovernmentBody location = GetTestMeeting(governmentBodyId);
+        GovBody location = GetTestMeeting(governmentBodyId);
         return location;
     }
 
@@ -28,26 +28,26 @@ namespace GM.DatabaseRepositories
 
     public long GetIdOfMatching(string country, string state, string county, string municipality)
     {
-        GovernmentBody govBody = new GovernmentBody(country, state, county, municipality);
+        GovBody govBody = new GovBody(country, state, county, municipality);
         return GetIdOfMatching(govBody);
     }
 
-    public long GetIdOfMatching(GovernmentBody g)
+    public long GetIdOfMatching(GovBody g)
     {
-        GovernmentBody govBody = GetMatching(g);
+        GovBody govBody = GetMatching(g);
 
         return (govBody == null) ? -1 : govBody.Id;
     }
 
-    public GovernmentBody GetMatching(string country, string state, string county, string municipality)
+    public GovBody GetMatching(string country, string state, string county, string municipality)
     {
-        GovernmentBody govBody = new GovernmentBody(country, state, county, municipality);
+        GovBody govBody = new GovBody(country, state, county, municipality);
         return GetMatching(govBody);
     }
 
-    public GovernmentBody GetMatching(GovernmentBody g)
+    public GovBody GetMatching(GovBody g)
     {
-        GovernmentBody govBody = testGovBodies.Find(e =>
+        GovBody govBody = testGovBodies.Find(e =>
             (e.Country == g.Country) &&
             (e.County == g.County) &&
             (e.State == g.State) &&
@@ -58,11 +58,11 @@ namespace GM.DatabaseRepositories
 
     public long Add(string country, string state, string county, string municipality)
     {
-        GovernmentBody g = new GovernmentBody(country, state, county, municipality);
+        GovBody g = new GovBody(country, state, county, municipality);
         return Add(g);
     }
 
-    public long Add(GovernmentBody govBody )
+    public long Add(GovBody govBody )
     {      
         long id= testGovBodies.Count + 1;
         govBody.Id = id;
@@ -71,15 +71,15 @@ namespace GM.DatabaseRepositories
     }
 
 
-    private GovernmentBody GetTestMeeting(long govBodyId)
+    private GovBody GetTestMeeting(long govBodyId)
     {
-        GovernmentBody govBody = testGovBodies.Single(m => m.Id == govBodyId);
+        GovBody govBody = testGovBodies.Single(m => m.Id == govBodyId);
         return govBody;
     }
 
-    private List<GovernmentBody> testGovBodies = new List<GovernmentBody>
+    private List<GovBody> testGovBodies = new List<GovBody>
         {
-            new GovernmentBody()
+            new GovBody()
             {
                 Id = 1,
                 Name = "Selectmen",
@@ -89,7 +89,7 @@ namespace GM.DatabaseRepositories
                 Municipality = "BoothbayHarbor",
                 Languages = new List<Language> {new Language {Id = 1, Name = "en"} }
             },
-            new GovernmentBody()
+            new GovBody()
             {
                 Id = 2,
                 Name = "CityCouncil",

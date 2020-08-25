@@ -15,9 +15,9 @@ namespace GM.DatabaseRepositories
             dBOperations = _dBOperations;
         }
 
-        public GovernmentBody Get(long governmentBodyId)
+        public GovBody Get(long governmentBodyId)
         {
-            GovernmentBody govBody = dBOperations.GetGovernmentBody(governmentBodyId);
+            GovBody govBody = dBOperations.GetGovernmentBody(governmentBodyId);
             return govBody;
         }
         public long GetIdOfMatching(string country, string state, string county, string municipality)
@@ -26,25 +26,25 @@ namespace GM.DatabaseRepositories
             return -1;
         }
 
-        public long GetIdOfMatching(GovernmentBody g)
+        public long GetIdOfMatching(GovBody g)
         {
             // TODO - implement - return ID of body based on country, state, county & municipality.
             return -1;
         }
 
-        public GovernmentBody GetMatching(string country, string state, string county, string municipality)
+        public GovBody GetMatching(string country, string state, string county, string municipality)
         {
             // TODO - implement - return ID of body based on country, state, county & municipality.
             return null;
         }
 
-        public GovernmentBody GetMatching(GovernmentBody g)
+        public GovBody GetMatching(GovBody g)
         {
             // TODO - implement - return ID of body based on country, state, county & municipality.
             return null;
         }
 
-        public long Add(GovernmentBody g)
+        public long Add(GovBody g)
         {
             // TODO implement
             return -1;

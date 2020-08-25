@@ -23,9 +23,9 @@ namespace GM.Webapp.Features.Govbodies
         }
 
         [HttpGet("{meetingId}")]
-        public GovernmentBody Get(int govBodyId)
+        public GovBody Get(int govBodyId)
         {
-            GovernmentBody ret = govBodies.Get(govBodyId);
+            GovBody ret = govBodies.Get(govBodyId);
             return ret;
         }
 
