@@ -26,7 +26,7 @@ namespace GM.DatabaseAccess.Tests
         {
             // ARRANGE
 
-            GovernmentBody bodyWritten = new GovernmentBody()
+            GovBody bodyWritten = new GovBody()
             {
                 Name = "U.S. Senate",
                 Country = "U.S.A.",
@@ -61,7 +61,7 @@ namespace GM.DatabaseAccess.Tests
         {
             // ARRANGE
 
-            GovernmentBody bodyWritten = new GovernmentBody()
+            GovBody bodyWritten = new GovBody()
             {
                 Name = "U.S. Congress",
                 Country = "U.S.A.",
