@@ -2,12 +2,11 @@
 using Newtonsoft.Json;
 using System.IO;
 using Microsoft.Extensions.Options;
-//using GM.DatabaseRepositories;
 using GM.ViewModels;
 using GM.Configuration;
-using GM.DatabaseRepositories;
 using GM.DatabaseModel;
 using GM.Utilities;
+using GM.DatabaseAccess;
 
 namespace GM.FileDataRepositories
 {
@@ -16,22 +15,19 @@ namespace GM.FileDataRepositories
 
     public class ViewMeetingRepository : IViewMeetingRepository
     {
-        private const string WORK_FOLDER_NAME = "ViewMeeting";
+        private const string SUB_WORK_FOLDER = "ViewMeeting";
         const string WORK_FILE_NAME = "ToView.json";
 
         private readonly AppSettings _config;
-        readonly IMeetingRepository meetingRepository;          // database meeting repository
-        readonly IGovBodyRepository govBodyRepository;          // database govbody repository
+        readonly IDBOperations dBOperations;
 
         public ViewMeetingRepository(
             IOptions<AppSettings> config,
-            IMeetingRepository _meetingRepository,
-            IGovBodyRepository _govBodyRepository
+            IDBOperations _dBOperations
             )
         {
             _config = config.Value;
-            meetingRepository = _meetingRepository;
-            govBodyRepository = _govBodyRepository;
+            dBOperations = _dBOperations;
         }
 
         public ViewtranscriptView Get(long meetingId)
@@ -57,31 +53,13 @@ namespace GM.FileDataRepositories
             return result;
         }
 
-        //private ViewtranscriptView GetViewMeetingByPath(string meetingPath)
-        //{
-        //    string meetingString = GMFileAccess.Readfile(meetingPath);
-        //    if (meetingString != null)
-        //    {
-        //        ViewtranscriptView meeting = JsonConvert.DeserializeObject<ViewtranscriptView>(meetingString);
-        //        return meeting;
-        //    } else
-        //    {
-        //        return null;
-        //    }
-        //}
-
         private string GetWorkFolderPath(long meetingId)
         {
-            Meeting meeting = meetingRepository.Get(meetingId);
-            GovernmentBody g = govBodyRepository.Get(meeting.GovernmentBodyId);
-            string language = g.Languages[0].Name;
+            Meeting meeting = dBOperations.GetMeeting(meetingId);
 
-            MeetingFolder meetingFolder = new MeetingFolder(g.Country, g.State, g.County, g.Municipality, meeting.Date, g.Name, language);
-            string meetingFolderPath = meetingFolder.path;
+            string workfolderName = meeting.WorkFolder;
 
-
-            string workFolder = _config.DatafilesPath + @"\PROCESSING\" + meetingFolderPath + @"\" + WORK_FOLDER_NAME;
-            //string workFolderPath = Path.Combine(_config.DatafilesPath, workFolder);
+            string workFolder = _config.DatafilesPath + @"\PROCESSING\" + workfolderName + @"\" + SUB_WORK_FOLDER;
             return workFolder;
         }
 

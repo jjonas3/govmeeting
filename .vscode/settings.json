@@ -1,18 +1,57 @@
 {
   "files.exclude": {
+    "**/node_modules": true,
     "**/dist": true,
     "**/wwwroot": true,
-    "**/assets/docs/TRANS": true
+    "**/assets/docs/TRANS": true,
+    "**/bin": true,
+    "**/obj": true
+  },
+  "search.exclude": {
+    "**/.git": true,
+    "**/node_modules/*": true,
+    "**/wwwroot": true,
+    "**/assets/docs/TRANS": true,
+    "**/bin": true,
+    "**/obj": true
   },
   "VSCodeCounter.showInStatusBar": false,
-  "workbench.colorCustomizations": {
-    "terminal.foreground": "#00FD61",
-    "terminal.background": "#383737"
-  },
   "editor.formatOnSave": true,
+  "editor.formatOnPaste": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.codeActionsOnSave": {
     "source.fixAll.tslint": true
   },
-  "dotnet-test-explorer.testProjectPath": "**/*Tests.@(csproj|fsproj)"
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "workbench.colorCustomizations": {
+    "terminal.foreground": "#00FD61",
+    "terminal.background": "#383737"
+  },
+  "todo-tree.general.tags": ["TODO", "FIXME"],
+  "todo-tree.filtering.excludeGlobs": [
+    "**/vendor/**",
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/bower_components/**",
+    "**/build/**",
+    "**/.vscode/**",
+    "**/.github/**",
+    "**/_output/**",
+    "**/*.min.*",
+    "**/*.map",
+    "**/coverage/**",
+    "**/assets/**"
+  ],
+  "dotnet-test-explorer.testProjectPath": "**/*Tests.@(csproj|fsproj)",
+  "mssql.connections": [
+    {
+      "server": "(localdb)\\mssqllocaldb",
+      "database": "Govmeeting",
+      "authenticationType": "Integrated",
+      "profileName": "GovProfile",
+      "password": ""
+    }
+  ]
 }

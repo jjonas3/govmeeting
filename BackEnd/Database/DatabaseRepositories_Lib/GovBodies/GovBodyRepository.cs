@@ -1,54 +1,25 @@
-﻿using System;
+﻿using GM.DatabaseModel;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using GM.DatabaseAccess;
-using GM.DatabaseModel;
+using System.Text;
 
 namespace GM.DatabaseRepositories
 {
     public class GovBodyRepository : IGovBodyRepository
     {
-        dBOperations dBOperations;
-
-        public GovBodyRepository(dBOperations _dBOperations)
+        public GovBody Get(long Id)
         {
-            dBOperations = _dBOperations;
+            return new GovBody();
         }
 
-        public GovernmentBody Get(long governmentBodyId)
+        public long Add(GovBody govBody)
         {
-            GovernmentBody govBody = dBOperations.GetGovernmentBody(governmentBodyId);
-            return govBody;
-        }
-        public long GetIdOfMatching(string country, string state, string county, string municipality)
-        {
-            // TODO - implement - return ID of body based on country, state, county & municipality.
-            return -1;
+            return 0;
         }
 
-        public long GetIdOfMatching(GovernmentBody g)
+        public List<GovBody> FindThoseWithScheduledMeetings()
         {
-            // TODO - implement - return ID of body based on country, state, county & municipality.
-            return -1;
+            return new List<GovBody>();
         }
-
-        public GovernmentBody GetMatching(string country, string state, string county, string municipality)
-        {
-            // TODO - implement - return ID of body based on country, state, county & municipality.
-            return null;
-        }
-
-        public GovernmentBody GetMatching(GovernmentBody g)
-        {
-            // TODO - implement - return ID of body based on country, state, county & municipality.
-            return null;
-        }
-
-        public long Add(GovernmentBody g)
-        {
-            // TODO implement
-            return -1;
-        }
-
     }
 }

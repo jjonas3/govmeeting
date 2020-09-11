@@ -8,18 +8,15 @@ namespace GM.DatabaseRepositories
 {
     public class MeetingRepository : IMeetingRepository
     {
-        dBOperations dBOps;
-        IGovBodyRepository _govBodyRepository;
+        readonly DBOperations dBOps;
 
-        public MeetingRepository(dBOperations _dBOps, IGovBodyRepository govBodyRepository)
+        public MeetingRepository(DBOperations _dBOps)
         {
             dBOps = _dBOps;
-            _govBodyRepository = govBodyRepository;
         }
 
         public Meeting Get(long meetingId)
         {
-            //dBOperations dbo = new dBOperations(); 
             Meeting meeting = dBOps.GetMeeting(meetingId);
             return meeting;
         }
@@ -52,6 +49,17 @@ namespace GM.DatabaseRepositories
         {
             // TODO - implement
             return null;
+        }
+
+        public string GetLongName(long meetingId)
+        {
+            return "";
+        }
+
+        public string GetSourceFilename(long meetingId)
+        {
+            Meeting m = Get(meetingId);
+            return m.SourceFilename;
         }
 
     }
