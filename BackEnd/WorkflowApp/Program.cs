@@ -3,6 +3,7 @@ using System.IO;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using NLog;
 using NLog.Web;
 using GM.Configuration;
@@ -17,8 +18,9 @@ using Microsoft.Extensions.Options;
 using Google.Cloud.Storage.V1;
 using GM.Utilities;
 using GM.DatabaseAccess_Stub;
+using GM.GetOnlineFiles;
 
-namespace GM.Workflow
+namespace GM.WorkflowApp
 {
     /* Eventually This may become part of WebApp. It is in a separate proceess
      * for development. We want to start it in the same way that WebApp will start it.
@@ -31,7 +33,8 @@ namespace GM.Workflow
         {
             // https://pioneercode.com/post/dependency-injection-logging-and-configuration-in-a-dot-net-core-console-app
 
-            string credentialsFilePath = @"C:\GOVMEETING\SECRETS\TranscribeAudio.json";
+            string secrets = GMFileAccess.FindParentFolderWithName("SECRETS");
+            string credentialsFilePath = Path.Combine(secrets, "TranscribeAudio.json");
             Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", credentialsFilePath);
 
             //StorageClient storageClient = StorageClient.Create();
@@ -82,9 +85,9 @@ namespace GM.Workflow
             var environmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 
             // add configured instance of logging
-            services.AddSingleton(new LoggerFactory()
-                .AddConsole()
-                .AddDebug());
+            //services.AddSingleton(new LoggerFactory()
+            //    .AddConsole()
+            //    .AddDebug());
 
             // add logging
             services.AddLogging();
@@ -142,16 +145,18 @@ namespace GM.Workflow
             services.AddSingleton<IMeetingRepository, MeetingRepository_Stub>();
             //services.AddSingleton<IGovBodyRepository, GovBodyRepository_Stub>();
             services.AddSingleton<IGovLocationRepository, GovLocationRepository_Stub>();
+            services.AddSingleton<IGovLocationRepository, GovLocationRepository_Stub>();
+            services.AddSingleton<IRetrieveNewFiles, RetrieveNewFiles>();
 
             // TODO make singletons
-            services.AddTransient<WF1_RetrieveOnlineFiles>();
-            services.AddTransient<WF2_ProcessTranscripts>();
-            services.AddTransient<WF3_TranscribeRecordings>();
-            services.AddTransient<WF4_TagTranscripts>();
-            services.AddTransient<WF5_EditTranscriptions>();
-            services.AddTransient<WF6_ViewMeetings>();
-            services.AddTransient<WF7_LoadDatabase>();
-            services.AddTransient<WF8_SendAlerts>();
+            services.AddTransient<WF1_Retrieve>();
+            services.AddTransient<WF2_Process>();
+            services.AddTransient<WF3_Transcribe>();
+            services.AddTransient<WF4_Tag>();
+            services.AddTransient<WF5_Edit>();
+            services.AddTransient<WF6_View>();
+            services.AddTransient<WF7_Load>();
+            services.AddTransient<WF8_Alert>();
 
             // add app
             services.AddTransient<WorkflowController>();

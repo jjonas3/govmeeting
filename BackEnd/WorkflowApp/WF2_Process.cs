@@ -10,56 +10,67 @@ using GM.Configuration;
 //using GM.FileDataRepositories;
 using GM.DatabaseModel;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using GM.Utilities;
 using ChinhDo.Transactions;
 using System.Transactions;
 using GM.FileDataRepositories;
 using GM.DatabaseAccess;
 
-namespace GM.Workflow
+namespace GM.WorkflowApp
 {
-    public class WF2_ProcessTranscripts
+    public class WF2_Process
     {
-        readonly ILogger<WF2_ProcessTranscripts> logger;
+        readonly ILogger<WF2_Process> logger;
         readonly AppSettings config;
         readonly ITranscriptProcess transcriptProcess;
         readonly IDBOperations dBOperations;
+
         //readonly IFileRepository fileRepository;
 
-        public WF2_ProcessTranscripts(
-            ILogger<WF2_ProcessTranscripts> _logger,
+        // This is for if we need to debug a Github Actions issue.
+        //readonly ILogger<WF2_ProcessTranscripts> loggerReal;
+
+        public WF2_Process(
+            ILogger<WF2_Process> _logger,
             IOptions<AppSettings> _config,
             ITranscriptProcess _transcriptProcess,
             IDBOperations _dBOperations
-            //IFileRepository _fileRepository
            )
         {
             logger = _logger;
             config = _config.Value;
             transcriptProcess = _transcriptProcess;
             dBOperations = _dBOperations;
+
+            // This is for if we need to debug a Github Actions issue.
+            //ILoggerFactory loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
+            //loggerReal = loggerFactory.CreateLogger<WF2_ProcessTranscripts>();
+            //loggerReal.LogInformation("REALLOGGER MAIN - WF2_ProcessTranscripts");
         }
 
         public void Run()
         {
             // 
-            bool? isApproved = true;        // We want the received transcripts that were approved.
-            if (!config.RequireManagerApproval) isApproved = null;  // unless config setting says otherwise.
+            bool? isApproved = true;        // We want only the received transcripts that were approved.
+            if (!config.RequireManagerApproval) isApproved = null;  // unless the config setting says otherwise.
+
             List<Meeting> meetings = dBOperations.FindMeetings(SourceType.Transcript, WorkStatus.Received, isApproved);
 
             foreach (Meeting meeting in meetings)
             {
                     DoWork(meeting);
             }
-
         }
 
         private void DoWork(Meeting meeting)
         {
-            string workFolderPath = Path.Combine(config.DatafilesPath, meeting.WorkFolder);
-            string processedFilePath = Path.Combine(workFolderPath, WorkfileNames.processedTranscript);
+            string workfolderName = dBOperations.GetWorkFolderName(meeting);
 
-            // For wrapping the file and database operations in the same transaction
+            string workFolderPath = Path.Combine(config.DatafilesPath, workfolderName);
+            string processedFile = Path.Combine(workFolderPath, WorkfileNames.processedTranscript);
+
+            // For wrapping file database operations in the same transaction
             TxFileManager fileMgr = new TxFileManager();
 
             using (TransactionScope scope = new TransactionScope())
@@ -76,7 +87,7 @@ namespace GM.Workflow
 
             using (TransactionScope scope = new TransactionScope())
             {
-                fileMgr.WriteAllText(processedFilePath, processedOutput);
+                fileMgr.WriteAllText(processedFile, processedOutput);
 
                 meeting.WorkStatus = WorkStatus.Processed;
                 meeting.Approved = false;

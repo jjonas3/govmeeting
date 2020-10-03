@@ -13,16 +13,16 @@ using GM.DatabaseModel;
 using Microsoft.Extensions.Logging;
 using GM.DatabaseAccess;
 
-namespace GM.Workflow
+namespace GM.WorkflowApp
 {
-    public class WF7_LoadDatabase
+    public class WF7_Load
     {
-        readonly ILogger<WF7_LoadDatabase> logger;
+        readonly ILogger<WF7_Load> logger;
         readonly AppSettings config;
         readonly IDBOperations dBOperations;
 
-        public WF7_LoadDatabase(
-            ILogger<WF7_LoadDatabase> _logger,
+        public WF7_Load(
+            ILogger<WF7_Load> _logger,
             IOptions<AppSettings> _config,
             IDBOperations _dBOperations
            )
@@ -48,9 +48,8 @@ namespace GM.Workflow
         // Load the data into the database
         public void DoWork(Meeting meeting)
         {
-            // Get the work folder path
-            //MeetingFolder meetingFolder = new MeetingFolder(govBodyRepository, meeting);
-            string workFolderPath = config.DatafilesPath + "\\PROCESSING\\" + meeting.WorkFolder;
+            string workfolderName = dBOperations.GetWorkFolderName(meeting);
+            string workFolderPath = config.DatafilesPath + workfolderName;
 
             // TODO - This code is old and needs to be re-written
             // loadDatabase.Process(destFilePath, workFolderPath, language);

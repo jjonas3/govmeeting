@@ -24,7 +24,7 @@ namespace GM.EditTranscript
         //    int sectionNumber;
         //    readonly FixasrView[] fixasrSegment = new FixasrView[2];
 
-        public void Split(FixasrView fixasr, string outputFolder, int sectionSize, int overlap, int parts)
+        public void Split(FixasrViewModel fixasr, string outputFolder, int sectionSize, int overlap, int parts)
         {
             //        fixasrSegment[0] = new FixasrView();
             //        fixasrSegment[1] = new FixasrView();
@@ -85,7 +85,7 @@ namespace GM.EditTranscript
 
     //        // https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/interpolated-strings
     //        // https://docs.microsoft.com/en-us/dotnet/standard/base-types/standard-numeric-format-strings
-    //        string outputFile = outputFolder + "\\" + $"part{partNumber:D2}" + "\\ToFix.json";
+    //        string outputFile = Path.Combine(outputFolder,$"part{partNumber:D2}","ToFix.json");
 
     //        File.WriteAllText(outputFile, stringValue);
     //    }

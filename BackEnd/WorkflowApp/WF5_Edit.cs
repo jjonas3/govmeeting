@@ -10,15 +10,15 @@ using GM.DatabaseModel;
 using GM.EditTranscript;
 using GM.DatabaseAccess;
 
-namespace GM.Workflow
+namespace GM.WorkflowApp
 {
 
-    public class WF5_EditTranscriptions
+    public class WF5_Edit
     {
         readonly AppSettings config;
         readonly IDBOperations dBOperations;
 
-        public WF5_EditTranscriptions(
+        public WF5_Edit(
             IOptions<AppSettings> _config,
             IDBOperations _dBOperations
             )
@@ -48,7 +48,7 @@ namespace GM.Workflow
             ///// Reformat the JSON transcript to match what the fixasr routine will use.
 
             //ModifyTranscriptJson_1 convert = new ModifyTranscriptJson_1();
-            //outputJsonFile = meetingFolder + "\\" + "04-ToFix.json";
+            //outputJsonFile = Path.Combine(meetingFolder, "04-ToFix.json");
             //FixasrView fixasr = convert.Modify(transcript);
             //stringValue = JsonConvert.SerializeObject(fixasr, Formatting.Indented);
             //File.WriteAllText(outputJsonFile, stringValue);
@@ -69,9 +69,9 @@ namespace GM.Workflow
             bool b = true;
             if (b) return;
 
-            FixasrView fixasr = JsonConvert.DeserializeObject<FixasrView>(fixasrText);
+            FixasrViewModel fixasr = JsonConvert.DeserializeObject<FixasrViewModel>(fixasrText);
             FormatConversions formatConversions = new FormatConversions();
-            AddtagsView addtags = formatConversions.ConvertFixasrToAddtags(fixasr);
+            AddtagsViewModel addtags = formatConversions.ConvertFixasrToAddtags(fixasr);
 
             //addtagsRepository.Put(addtags, meeting.Id);
 
@@ -79,7 +79,8 @@ namespace GM.Workflow
 
         private void CheckIfEditingCompleted(Meeting meeting)
         {
-            string workFolderPath = config.DatafilesPath + "\\PROCESSING\\" + meeting.WorkFolder;
+            string workfolderName = dBOperations.GetWorkFolderName(meeting);
+            string workFolderPath = config.DatafilesPath + workfolderName;
 
             // TODO - When all of the tagging for a specific transcript is completed, it should:
             //   Change the WorkStatus field in the Meeting Record from "Tagging" to "Tagged"

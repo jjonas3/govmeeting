@@ -37,7 +37,7 @@ namespace GM.ProcessRecording_Tests
         {
             string fixasrFile = @"C:\GOVMEETING\_SOURCECODE\src\DATAFILES\USA_ME_LincolnCounty_BoothbayHarbor_Selectmen_en\2017-02-15\R3-ToBeFixed.json";
             string stringValue = File.ReadAllText(fixasrFile);
-            FixasrView fixasr = JsonConvert.DeserializeObject<FixasrView>(stringValue);
+            FixasrViewModel fixasr = JsonConvert.DeserializeObject<FixasrViewModel>(stringValue);
             string outputFolder = @"C:\GOVMEETING\_SOURCECODE\src\DATAFILES\USA_ME_LincolnCounty_BoothbayHarbor_Selectmen_en\2017-02-15\FixText";
             int sectionSize = 180;
             int overlap = 5;
@@ -53,12 +53,12 @@ namespace GM.ProcessRecording_Tests
             //string videoFile = testdata + @"\TestMoveToCloudAndTranscribe - Copy\USA_ME_LincolnCounty_BoothbayHarbor_Selectmen_EN_2017-02-15.mp4";
             //string transcriptFile = testdata + @"\TestMoveToCloudAndTranscribe - Copy\USA_ME_LincolnCounty_BoothbayHarbor_Selectmen_EN_2017-02-15.json";
 
-            //string outputFolder = testdata + "\\" + "TestSplitIntoWorkSegments";
+            //string outputFolder = Path.Combine(testdata, "TestSplitIntoWorkSegments");
             //DeleteAndCreateDirectory(outputFolder);
 
             string outputFolder = @"C:\GOVMEETING\_SOURCECODE\src\DATAFILES\USA_ME_LincolnCounty_BoothbayHarbor_Selectmen_EN\2017-01-09";
-            string videoFile = outputFolder + "\\" + "01-Video.mp4";
-            string transcriptFile = outputFolder + "\\" + "R3-ToBeFixed.json";
+            string videoFile = Path.Combine(outputFolder, "01-Video.mp4");
+            string transcriptFile = Path.Combine(outputFolder, "R3-ToBeFixed.json");
             int segmentSize = 180;
             int overlap = 5;
 
@@ -70,7 +70,7 @@ namespace GM.ProcessRecording_Tests
         {
             string inputFile = testfilesPath + @"\USA_ME_LincolnCounty_BoothbayHarbor_Selectmen_EN_2017-02-15-rsp.json";
 
-            string outputFolder = testfilesPath + "\\" + "TestReformatOfTranscribeResponse";
+            string outputFolder = Path.Combine(testfilesPath, "TestReformatOfTranscribeResponse");
             GMFileAccess.DeleteAndCreateDirectory(outputFolder);
             string outputFile = outputFolder + @"\USA_ME_LincolnCounty_BoothbayHarbor_Selectmen_EN_2017-02-15.json";
 
@@ -78,7 +78,7 @@ namespace GM.ProcessRecording_Tests
             var transcript = JsonConvert.DeserializeObject<TranscribeResultOrig>(stringValue);
 
             ModifyTranscriptJson_1 convert = new ModifyTranscriptJson_1();
-            FixasrView fixasr = convert.Modify(transcript);
+            FixasrViewModel fixasr = convert.Modify(transcript);
 
             stringValue = JsonConvert.SerializeObject(fixasr, Formatting.Indented);
             File.WriteAllText(outputFile, stringValue);

@@ -6,6 +6,7 @@ using System.Security.Cryptography.X509Certificates;
 using Bogus;
 using Bogus.DataSets;
 using GM.DatabaseModel;
+using GM.ViewModels;
 
 namespace FakeData
 {
@@ -23,12 +24,18 @@ namespace FakeData
         {
             Console.WriteLine("Hello World!");
 
-            FakeMeeting fm = new FakeMeeting();
-            Meeting meeting = fm.GenerateMeeting();
+            //FakeMeeting fm = new FakeMeeting();
+            //Meeting meeting = fm.GenerateMeeting();
 
-            string text = Newtonsoft.Json.JsonConvert.SerializeObject(meeting, Newtonsoft.Json.Formatting.Indented);
+            //string text = Newtonsoft.Json.JsonConvert.SerializeObject(meeting, Newtonsoft.Json.Formatting.Indented);
 
-            File.WriteAllText(@"c:\tmp\fakemeeting.json", text);
+            //File.WriteAllText(@"c:\tmp\fakemeeting.json", text);
+
+            FakeTranscriptViewModel ft = new FakeTranscriptViewModel();
+            TranscriptViewModel tvm = ft.GenerateFake();
+            string text = Newtonsoft.Json.JsonConvert.SerializeObject(tvm, Newtonsoft.Json.Formatting.Indented);
+            File.WriteAllText(@"c:\tmp\faketvm.json", text);
+
         }
 
     }

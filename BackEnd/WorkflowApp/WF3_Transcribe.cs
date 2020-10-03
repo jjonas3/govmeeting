@@ -15,20 +15,20 @@ using GM.EditTranscript;
 using GM.DatabaseAccess;
 
 
-namespace GM.Workflow
+namespace GM.WorkflowApp
 {
-    public class WF3_TranscribeRecordings
+    public class WF3_Transcribe
     {
-        readonly ILogger<WF3_TranscribeRecordings> logger;
+        readonly ILogger<WF3_Transcribe> logger;
         readonly AppSettings config;
-        readonly RecordingProcess processRecording;
+        readonly IRecordingProcess processRecording;
         readonly IDBOperations dBOperations;
         readonly WorkSegments workSegments = new WorkSegments();
 
-        public WF3_TranscribeRecordings(
-            ILogger<WF3_TranscribeRecordings> _logger,
+        public WF3_Transcribe(
+            ILogger<WF3_Transcribe> _logger,
             IOptions<AppSettings> _config,
-            RecordingProcess _processRecording,
+            IRecordingProcess _processRecording,
             IDBOperations _dBOperations
            )
         {
@@ -61,13 +61,9 @@ namespace GM.Workflow
 
             // Create workfolder
             string workfolderPath = GetWorkfolderPath(meeting);
-            if (!CreateWorkfolder(workfolderPath))
-            {
-                return;
-            }
 
             // transcribe recording
-            string sourceFilePath = config.DatafilesPath + "\\RECEIVED\\" + meeting.SourceFilename;
+            string sourceFilePath = Path.Combine(workfolderPath, meeting.SourceFilename);
             processRecording.Process(sourceFilePath, workfolderPath, meeting.Language);
 
             meeting.WorkStatus = WorkStatus.Transcribed;
@@ -80,19 +76,19 @@ namespace GM.Workflow
 
         private string GetWorkfolderPath(Meeting meeting)
         {
-            string workFolderPath = config.DatafilesPath + "\\PROCESSING\\" + meeting.WorkFolder;
-
+            string workfolderName = dBOperations.GetWorkFolderName(meeting);
+            string workFolderPath = config.DatafilesPath + workfolderName;
             return workFolderPath;
         }
 
-        private bool CreateWorkfolder(string workFolderPath)
-        {
-            if (!GMFileAccess.CreateDirectory(workFolderPath))
-            {
-                Console.WriteLine($"ProcessRecordings - ERROR: could not create meeting folder {workFolderPath}");
-                return false;
-            }
-            return true;
-        }
+        //private bool CreateWorkfolder(string workFolderPath)
+        //{
+        //    if (!GMFileAccess.CreateDirectory(workFolderPath))
+        //    {
+        //        Console.WriteLine($"ProcessRecordings - ERROR: could not create meeting folder {workFolderPath}");
+        //        return false;
+        //    }
+        //    return true;
+        //}
     }
 }

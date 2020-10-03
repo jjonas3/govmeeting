@@ -13,7 +13,7 @@ using GM.Utilities;
 using GM.EditTranscript;
 using GM.DatabaseAccess;
 
-namespace GM.Workflow
+namespace GM.WorkflowApp
 {
     /* The final meeting transctipt is ready for viewing, when either:
      *  1.  An original transcript has been processed and tagged.
@@ -21,15 +21,15 @@ namespace GM.Workflow
      *  2. An original recording has been transcribed and edited.
      */
 
-    public class WF6_ViewMeetings
+    public class WF6_View
     {
-        readonly ILogger<WF6_ViewMeetings> logger;
+        readonly ILogger<WF6_View> logger;
         readonly AppSettings config;
         readonly IDBOperations dBOperations;
         readonly WorkSegments workSegments = new WorkSegments();
 
-        public WF6_ViewMeetings(
-            ILogger<WF6_ViewMeetings> _logger,
+        public WF6_View(
+            ILogger<WF6_View> _logger,
             IOptions<AppSettings> _config,
             IDBOperations _dBOperations
            )

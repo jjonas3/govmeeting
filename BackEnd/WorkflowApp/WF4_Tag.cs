@@ -9,9 +9,9 @@ using Microsoft.Extensions.Logging;
 using GM.Utilities;
 using GM.DatabaseAccess;
 
-namespace GM.Workflow
+namespace GM.WorkflowApp
 {
-    public class WF4_TagTranscripts
+    public class WF4_Tag
     {
         // TODO - IMPLEMENT THIS CLASS
 
@@ -27,12 +27,12 @@ namespace GM.Workflow
 
         readonly AppSettings config;
         readonly IDBOperations dBOperations;
-        readonly ILogger<WF2_ProcessTranscripts> logger;
+        readonly ILogger<WF2_Process> logger;
 
-        public WF4_TagTranscripts(
+        public WF4_Tag(
             IOptions<AppSettings> _config,
             IDBOperations _dBOperations,
-            ILogger<WF2_ProcessTranscripts> _logger
+            ILogger<WF2_Process> _logger
            )
         {
             logger = _logger;
@@ -64,7 +64,8 @@ namespace GM.Workflow
 
         public void DoWork(Meeting meeting)
         {
-            string workFolderPath = config.DatafilesPath + "\\PROCESSING\\" + meeting.WorkFolder;
+            string workfolderName = dBOperations.GetWorkFolderName(meeting);
+            string workFolderPath = config.DatafilesPath + workfolderName;
 
             if (!GMFileAccess.CreateDirectory(workFolderPath))
             {
@@ -74,14 +75,14 @@ namespace GM.Workflow
                 return;
             }
 
-            string sourceFilePath = config.DatafilesPath + "\\RECEIVED\\" + meeting.SourceFilename;
+            string sourceFilePath = Path.Combine(config.DatafilesPath, "RECEIVED", meeting.SourceFilename);
             if (!File.Exists(sourceFilePath))
             {
                 logger.LogError("Source file does not exist: ${sourceFilePath}");
                 return;
             }
 
-            string destFilePath = config.DatafilesPath + "\\PROCESSING\\" + meeting.SourceFilename;
+            string destFilePath = Path.Combine(config.DatafilesPath, "PROCESSING", meeting.SourceFilename);
             if (File.Exists(destFilePath))
             {
                 logger.LogError("Destination file already exists: ${destFilePath}");

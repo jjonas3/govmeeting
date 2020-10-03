@@ -3,7 +3,7 @@ using GM.EditTranscript;
 using GM.ProcessRecording;
 using GM.Utilities;
 
-namespace GM.Workflow
+namespace GM.WorkflowApp
 {
     public static class InitializeFileTestData {
         public static string CopyTestData(string testfilesPath, string datafilesPath, bool deleteProcessing)
@@ -17,7 +17,7 @@ namespace GM.Workflow
             } else {
                 if (deleteProcessing)
                 {
-                    GMFileAccess.DeleteDirectoryContents(datafilesPath + @"\PROCESSING");
+                    GMFileAccess.DeleteDirectoryContents(Path.Combine(datafilesPath, "PROCESSING"));
                 }
             }
 
@@ -50,10 +50,10 @@ namespace GM.Workflow
 
             foreach (string file in files)
             {
-                string source = testfilesPath + "\\" + file;
+                string source = Path.Combine(testfilesPath, file);
 
                 if (File.Exists(source)) {
-                    string destination = datafilesPath + "\\" + "RECEIVED" + "\\" + file;
+                    string destination = Path.Combine(datafilesPath, "RECEIVED", file);
                     if (!File.Exists(destination))
                     {
                         // For testing, use only the first 9 minutes of the video recordings.
