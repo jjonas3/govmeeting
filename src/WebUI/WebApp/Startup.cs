@@ -1,35 +1,51 @@
-using System;
-using System.IdentityModel.Tokens.Jwt;
+using GM.Application.AppCore.Common;
+using GM.Application.AppCore.Interfaces;
+using GM.Application.Configuration;
+using GM.Infrastructure.FileDataRepositories.EditMeetings;
+using GM.Infrastructure.FileDataRepositories.ViewMeetings;
+using GM.Infrastructure.InfraCore.Data;
+using GM.Infrastructure.InfraCore.Identity;
+using GM.Utilities;
+using GM.WebUI.WebApp.Services;
+using GM.WebUI.WebApp.StartupCustomizations;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Razor;
-using Microsoft.AspNetCore.SpaServices.AngularCli;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-using Microsoft.AspNetCore.Identity;
 using NLog;
-using GM.WebApp.StartupCustomizations;
-using GM.Configuration;
-using GM.DatabaseAccess;
-using GM.Utilities;
+using System;
+using System.IdentityModel.Tokens.Jwt;
+using System.IO;
+using System.Reflection;
 
-namespace GM.WebApp
+namespace GM.WebUI.WebApp
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IHostEnvironment environment)
         {
             Configuration = configuration;
+            Environment = environment;
         }
 
         NLog.Logger logger;
         public IConfiguration Configuration { get; }
+        public IHostEnvironment Environment { get; }
+
+        public void ConfigureDockerServices(IServiceCollection services)
+        {
+            services.AddDataProtection()
+                .SetApplicationName("govmeeting")
+                .PersistKeysToFileSystem(new DirectoryInfo(@"./"));
+            ConfigureServices(services);
+        }
 
         public void ConfigureServices(IServiceCollection services)
         {
@@ -39,16 +55,18 @@ namespace GM.WebApp
             ConfigureAppsettings(services);
             logger.Info("Configure Appsettings");
 
-            ConfigureDbContext(services);
-            logger.Info("Configure DbContext");
+            ConfigureDatabaseServices.Configure(services, Environment.EnvironmentName,
+                Configuration["AppSettings:DatabaseType"], Configuration["AppSettings:ConnectionString"]);
+            logger.Info("Configure Database");
 
-            services.AddHealthChecks();
-            logger.Info("AddHealthChecks");
+            //services.AddHealthChecks();
+            //logger.Info("AddHealthChecks");
 
             ConfigureAuthentication(services);
             logger.Info("Configure Authentication");
 
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+            logger.Info("Clear JWT ClaimTypeMap");
 
             ConfigureIdentity(services);
             logger.Info("Configure Identity");
@@ -59,6 +77,18 @@ namespace GM.WebApp
             services.AddControllersWithViews();
             logger.Info("Add services for Web API, MVC & Razor Views");
 
+            //services.AddOpenApiDocument();
+            services.AddSwaggerDocument(settings =>
+            {
+                settings.PostProcess = document =>
+                {
+                    document.Info.Version = "v1";
+                    document.Info.Title = "WebApp API";
+                    document.Info.Description = "REST API for WebApp.";
+                };
+            });
+            logger.Info("Add services for Swagger Document");
+
             services.AddRazorPages();
             logger.Info("Add services for Razor Pages");
 
@@ -66,41 +96,85 @@ namespace GM.WebApp
             logger.Info("Enable Feature Folders");
             // https://scottsauber.com/2016/04/25/feature-folder-structure-in-asp-net-core/
 
+            // Angular files will be served from this directory in production. 
             services.AddSpaStaticFiles(configuration => configuration.RootPath = "clientapp/dist");
             logger.Info("AddSpaStaticFiles");
-            // Angular files will be served from this directory in production. 
+
+            // get the current user for auditing
+            services.AddScoped<ICurrentUserService, CurrentUserService>();
+
+            Assembly executingAssembly = Assembly.GetExecutingAssembly();
+            services.AddCQR(executingAssembly);
+            logger.Info("Configure CQR Services");
+
+            services.AddTransient<IEmailSender, AuthMessageSender>();
+            services.AddTransient<ISmsSender, AuthMessageSender>();
+            logger.Info("Add email and sms");
+
+            services.AddScoped<ValidateReCaptchaAttribute>();
+            logger.Info("Add ValidateReCaptchaAttribute");
+
+            services.AddTransient<ISeedDatabase, SeedDatabase>();
+
+            services.AddTransient<IViewMeetingRepository, ViewMeetingRepository>();
+            services.AddTransient<IEditMeetingRepository, EditMeetingRepository>();
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ISeedDatabase seedDatabase)
         {
+            logger.Info("Entering startup -> Configure");
+            /*  NOTE: 
+             *  For Visual Studio, the URL's used during development are in
+             *      (WebApp) Project -> Properties -> Debug. Currently:
+             *      "App URL" = "http:/localhost:36029"
+             *      "Enable SSL" is checked. "https:/localhost:44333/"
+             *  For "dotnet run", the dev URL's are in WebApp\Properties\launchSettings.json,
+             *    Currently for IISExpress:
+             *      "applicationUrl": "http://localhost:36029",
+             *      "sslPort": 44333
+             *  For VsCode, the dev URL's are in clientapp/.vscode/launch.json. Currently:
+             *      "url": "http:/localhost:4200"
+             */
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
                 app.UseDatabaseErrorPage();
+                logger.Info("Is Development - use dev exception page & database error page");
             }
             else
             {
                 app.UseExceptionHandler("/Error");
                 // The default HSTS value is 30 days. You may want to change this for production, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
+                logger.Info("Is not Development - use exception handler & HSTS");
             }
 
             app.UseHttpsRedirection();
+            logger.Info("UseHttpsRedirection");
+
             app.UseStaticFiles();
+            logger.Info("UseStaticFiles");
 
             if (!env.IsDevelopment())
             {
                 app.UseSpaStaticFiles();
+                logger.Info("If not dev, UseSpaStaticFiles");
             }
 
             app.UseRouting();
+            logger.Info("UseRouting");
 
             // START OF ENDPOINT ZONE
 
             app.UseAuthentication();
+            logger.Info("UseAuthentication");
+
             app.UseAuthorization();
+            logger.Info("UseAuthorization");
 
             DebugCurrentEndpoint(app);
+            logger.Info("DebugCurrentEndpoint");
 
             // END OF ENDPOINT ZONE
 
@@ -108,10 +182,18 @@ namespace GM.WebApp
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller}/{action=Index}/{id?}");
+                    pattern: "{controller}/{action=Index}/{id?}"
+                );
+                logger.Info("endpoints.MapControllerRoute");
+
                 endpoints.MapRazorPages();
-                endpoints.MapHealthChecks("/health").RequireAuthorization();
+                logger.Info("endpoints.MapRazorPages");
+                //endpoints.MapHealthChecks("/health").RequireAuthorization();
             });
+
+            app.UseOpenApi();
+            app.UseSwaggerUi3();
+            logger.Info("UseOpenApi & UseSwaggerUi3");
 
             app.UseSpa(spa =>
             {
@@ -119,13 +201,18 @@ namespace GM.WebApp
                 // see https://go.microsoft.com/fwlink/?linkid=864501
 
                 spa.Options.SourcePath = "clientapp";
+                logger.Info("spa.Options.SourcePath");
 
                 if (env.IsDevelopment())
                 {
                     // spa.UseAngularCliServer(npmScript: "start");
                     spa.UseProxyToSpaDevelopmentServer("http://localhost:4200");
+                    logger.Info("Is dev, spa.UseProxyToSpaDevelopmentServer");
                 }
             });
+
+            //seedDatabase.Seed();
+
         }
 
         private void ConfigureLoggingService()
@@ -141,6 +228,15 @@ namespace GM.WebApp
             logger = LogManager.LoadConfiguration("nlog.config").GetCurrentClassLogger();
         }
 
+
+        //public IServiceCollection AddCQR(this IServiceCollection services)
+        //{
+        //    services.AddMediatR(Assembly.GetExecutingAssembly());
+        //    services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+        //    services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+        //    return services;
+        //}
+
         private void ConfigureAppsettings(IServiceCollection services)
         {
             services.AddOptions();
@@ -154,18 +250,6 @@ namespace GM.WebApp
                 logger.Info("DatafilesPath: {0}, TestdataPath: {2}",
                     myOptions.DatafilesPath, myOptions.TestdataPath);
             });
-        }
-
-        private void ConfigureDbContext(IServiceCollection services)
-        {
-            logger.Info("Add ApplicationDbContext");
-            services.AddTransient<DBOperations>();
-            services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(
-                    Configuration["AppSettings:ConnectionString"]
-                    //sqlServerOptions => sqlServerOptions.MigrationsAssembly("DatabaseAccess_Lib")
-                    //sqlServerOptions => sqlServerOptions.MigrationsAssembly("WebApp")
-                    ));
         }
 
         private void ConfigureAuthentication(IServiceCollection services)
@@ -186,6 +270,9 @@ namespace GM.WebApp
                 o.CallbackPath = "/signin-google"; // Or register the default "/sigin-oidc"
                 o.Scope.Add("email");
             });
+
+            services.AddTransient<ISeedAuth, SeedAuth>();
+
         }
 
         private void ConfigureIdentity(IServiceCollection services)

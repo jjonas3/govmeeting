@@ -1,4 +1,4 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 
@@ -12,6 +12,8 @@ import { NavService } from './sidenav/nav.service';
 import { Router } from '@angular/router';
 import { UserSettingsService, UserSettings, LocationType } from './common/user-settings.service';
 
+import { replaySubjectLog } from './logger-service';
+
 const NoLog = true; // set to false for console logging
 
 @Component({
@@ -19,7 +21,7 @@ const NoLog = true; // set to false for console logging
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
-export class AppComponent implements AfterViewInit, OnDestroy {
+export class AppComponent implements AfterViewInit, OnDestroy, OnInit {
   private ClassName: string = this.constructor.name + ': ';
   @ViewChild('sidenav', { static: false }) sidenav: ElementRef;
 
@@ -81,7 +83,7 @@ export class AppComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  ///      For testng ///////
+  //////  For debugging ///////
 
   sendSettings() {
     const userSettings: UserSettings = new UserSettings('en', 'Totowa', 'Council');
@@ -98,4 +100,52 @@ export class AppComponent implements AfterViewInit, OnDestroy {
   routeDash() {
     this.router.navigateByUrl('dash');
   }
+
+  //////////////////////////////////////////////////
+  // This code is for debugging timing issues.
+  // In app.component.html, uncomment:     <ul id="replaySubjectLogOutput"></ul>
+  //    and comment out:                   <router-outlet></router-outlet>
+  // This will replace most of the normal UI with the single <ul> element.
+  // In ngOnInit, we subscribe to the replaySubjectLog service.
+  // When any code calls "replaySubjectLog.next", we write their message as an item in
+  //      <ul> list.
+  // This lets us avoid running Chrome Dev tools (which may affect out timing issues)
+  // in order to see console output messages.
+
+  ngOnInit() {
+    //  let msg = 'AppComponent:ngOnInit. Enter';
+    //  this.addFullItem(msg);
+    //  replaySubjectLog.subscribe((data) => this.addFullItem('' + data));
+    //  replaySubjectLog.next('AppComponent:ngOnInit. Talking to myself after subscribing.');
+  }
+
+  addFullItem(msg: string) {
+    const fullmsg = msg + ' ' + this.getNow();
+    this.addItem(fullmsg);
+  }
+
+  addItem(val: any) {
+    const node = document.createElement('li');
+    const textnode = document.createTextNode(val);
+    node.appendChild(textnode);
+    document.getElementById('output').appendChild(node);
+  }
+
+  getNow(): string {
+    const now = Date.now();
+    const sec = Math.floor(now / 1000) % 100;
+    const ms = now % 1000;
+    return sec.toString() + ':' + ms.toString();
+  }
+  ////////////////////////////////////////////
+} // closing brace for the AppComponent class.
+
+////////////////////////////////////////////
+//// This code is also for debugging timing issues.
+function addItem(val: any) {
+  const node = document.createElement('li');
+  const textnode = document.createTextNode(val);
+  node.appendChild(textnode);
+  document.getElementById('output').appendChild(node);
 }
+////////////////////////////////////////////

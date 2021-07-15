@@ -4,12 +4,16 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <WarningsAsErrors>NU1605</WarningsAsErrors>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="HtmlAgilityPack" Version="1.11.23" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Domain\DatabaseModel_Lib\DatabaseModel_Lib.csproj" />
+    <ProjectReference Include="..\..\Application\Core_Lib\AppCore_Lib.csproj" />
   </ItemGroup>
 
 </Project>

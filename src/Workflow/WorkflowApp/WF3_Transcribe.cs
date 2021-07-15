@@ -1,19 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using GM.ProcessRecording;
-using GM.ProcessTranscript;
-using GM.ViewModels;
-using Microsoft.Extensions.Options;
-using GM.Configuration;
-using GM.FileDataRepositories;
-using GM.DatabaseModel;
+﻿using GM.Application.AppCore.Entities.Meetings;
+using GM.Application.Configuration;
+using GM.Application.EditTranscript;
+using GM.Application.ProcessRecording;
+using GM.Infrastructure.FileDataRepositories;
 using Microsoft.Extensions.Logging;
-using GM.Utilities;
-using GM.EditTranscript;
-using GM.DatabaseAccess;
+using Microsoft.Extensions.Options;
+using System.Collections.Generic;
 using System.Transactions;
+
+#pragma warning disable CS0219
 
 namespace GM.WorkflowApp
 {
@@ -22,7 +17,7 @@ namespace GM.WorkflowApp
         readonly ILogger<WF3_Transcribe> logger;
         readonly AppSettings config;
         readonly IRecordingProcess processRecording;
-        readonly IDBOperations dBOperations;
+        ////readonly IDBOperations dBOperations;
         readonly IFileRepository fileRepository;
         readonly WorkSegments workSegments = new WorkSegments();
 
@@ -30,14 +25,14 @@ namespace GM.WorkflowApp
             ILogger<WF3_Transcribe> _logger,
             IOptions<AppSettings> _config,
             IRecordingProcess _processRecording,
-            IDBOperations _dBOperations,
+            ////IDBOperations _dBOperations,
             IFileRepository _fileRepository
            )
         {
             logger = _logger;
             config = _config.Value;
             processRecording = _processRecording;
-            dBOperations = _dBOperations;
+            ////dBOperations = _dBOperations;
             fileRepository = _fileRepository;
         }
 
@@ -49,7 +44,9 @@ namespace GM.WorkflowApp
             if (!config.RequireManagerApproval) approved = null;
             List<Meeting> meetings;
 
-            meetings = dBOperations.FindMeetings(SourceType.Recording, WorkStatus.Received, approved);
+            ////meetings = dBOperations.FindMeetings(SourceType.Recording, WorkStatus.Received, approved);
+            meetings = new List<Meeting>();   // TODO - CA
+
             foreach (Meeting meeting in meetings)
             {
                 TranscribeRecording(meeting);
@@ -61,22 +58,20 @@ namespace GM.WorkflowApp
             string workfolderPath = fileRepository.WorkfolderPath(meeting);
             string sourcefilePath = fileRepository.SourcefilePath(meeting);
 
-            using (TransactionScope scope = new TransactionScope())
-            {
-                meeting.WorkStatus = WorkStatus.Transcribing;
+            using TransactionScope scope = new TransactionScope();
+            meeting.WorkStatus = WorkStatus.Transcribing;
 
-                // transcribe recording
-                processRecording.Process(sourcefilePath, workfolderPath, meeting.Language);
+            // transcribe recording
+            processRecording.Process(sourcefilePath, workfolderPath, meeting.Language);
 
-                meeting.WorkStatus = WorkStatus.Transcribed;
+            meeting.WorkStatus = WorkStatus.Transcribed;
 
-                // if true, editing will be allowed to proceed automatically.
-                // set to false to require manager approval.
-                meeting.Approved = true;
+            // if true, editing will be allowed to proceed automatically.
+            // set to false to require manager approval.
+            meeting.Approved = true;
 
-                dBOperations.WriteChanges();
-                scope.Complete();
-            }
+            ////dBOperations.WriteChanges();
+            scope.Complete();
         }
     }
 }

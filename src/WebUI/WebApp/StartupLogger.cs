@@ -4,12 +4,12 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace GM.WebApp
+namespace GM.WebUI.WebApp
 {
     // This is a basic alternative to NLog.
     public class StartupLogger
     {
-        StreamWriter stream;
+        readonly StreamWriter stream;
 
 
         public StartupLogger(string logFolder)

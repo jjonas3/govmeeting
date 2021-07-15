@@ -1,73 +1,75 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using GM.ViewModels;
-using GM.GoogleCloud;
+using GM.Infrastructure.GoogleCloud;
+using GM.Application.DTOs.Meetings;
 
-namespace GM.ProcessRecording
+namespace GM.Application.ProcessRecording
 {
 
     /**********************************************************************
-     * Modify the Google speech format to our own "EdittranscriptView" format.
+     * Modify the Google speech output to our own "MeetingEditDto" format.
      ***********************************************************************/
 
     public class ModifyTranscriptJson
     {
 
-        public EditTranscriptViewModel Modify(TranscribeResult transcript)
+        public EditMeeting_Dto Modify(Transcribed_Dto transcript)
         {
-            EditTranscriptViewModel editmeeting = new EditTranscriptViewModel();
+            EditMeeting_Dto editmeeting = new EditMeeting_Dto();
+            int wordNum = 0;   // running word sequence number
 
-            foreach (Result result in transcript.results)
+            foreach (TranscribedTalk_Dto result in transcript.Talks)
             {
-                Talk talk = new Talk(result.text, result.confidence);
+                EditMeetingTalk_Dto talk = new EditMeetingTalk_Dto(result.Transcript, result.Confidence);
                 int speaker = -1;
 
-                foreach (RespWord respword in result.words)
+                foreach (TranscribedWord_Dto respword in result.Words)
                 {
-                    Word word = new Word(
-                        respword.word,
-                        respword.confidence,
-                        respword.startTime,
-                        respword.endTime,
-                        respword.speakerTag,
-                        respword.wordNum
+                    EditMeetingWord_Dto word = new EditMeetingWord_Dto(
+                        respword.Word,
+                        respword.Confidence,
+                        respword.StartTime,
+                        respword.EndTime,
+                        respword.SpeakerTag,
+                        ++wordNum
                     );
-                    if (speaker != word.speaker)
+                    if (speaker != word.SpeakerTag)
                     {
                         if (speaker != -1)
                         {
-                            editmeeting.talks.Add(talk);
-                            talk = new Talk(result.text, result.confidence);
+                            editmeeting.Talks.Add(talk);
+                            talk = new EditMeetingTalk_Dto(result.Transcript, result.Confidence);
                         }
-                        speaker = word.speaker;
-                        talk.speaker = "Speaker " + speaker.ToString();
+                        speaker = word.SpeakerTag;
+                        talk.SpeakerName = "Speaker " + speaker.ToString();
                     }
-                    talk.words.Add(word);
+                    talk.Words.Add(word);
                 }
-                editmeeting.talks.Add(talk);
+                editmeeting.Talks.Add(talk);
             }
             return editmeeting;
         }
 
-        public EditTranscriptViewModel Modify2(TranscribeResult transcript)
+        public EditMeeting_Dto Modify2(Transcribed_Dto transcript)
         {
-            EditTranscriptViewModel editmeeting = new EditTranscriptViewModel();
+            EditMeeting_Dto editmeeting = new EditMeeting_Dto();
+            int wordNum = 0;   // running word sequence number
 
-            foreach (Result result in transcript.results)
+            foreach (TranscribedTalk_Dto result in transcript.Talks)
             {
-                Talk talk = new Talk(result.text, result.confidence);
-
+                EditMeetingTalk_Dto talk = new EditMeetingTalk_Dto(result.Transcript, result.Confidence);
                int speaker = -1;
-               foreach (RespWord respword in result.words)
+                 
+               foreach (TranscribedWord_Dto respword in result.Words)
                 {
-                    Word word = new Word(
-                        respword.word,
-                        respword.confidence,
-                        respword.startTime,
-                        respword.endTime,
-                        respword.speakerTag,
-                        respword.wordNum
+                    EditMeetingWord_Dto word = new EditMeetingWord_Dto(
+                        respword.Word,
+                        respword.Confidence,
+                        respword.StartTime,
+                        respword.EndTime,
+                        respword.SpeakerTag,
+                       ++wordNum
                     );
 
                     // Check if the speaker is the same for all words
@@ -76,34 +78,27 @@ namespace GM.ProcessRecording
                     {
                         if (speaker == -1)
                         {
-                            speaker = word.speaker;  // we found first speaker (could also be 0)
+                            speaker = word.SpeakerTag;  // we found first speaker (could also be 0)
                         }
                         else
                         {
-                            if (speaker != word.speaker)
+                            if (speaker != word.SpeakerTag)
                             {
                                 speaker = -2;  // we found two speakers do not match
                             }
                         }
                     }
 
-                    switch (speaker)
+                    talk.SpeakerName = speaker switch
                     {
-                        case 0:
-                            talk.speaker = "UNKOWN";
-                            break;
-                        case -2:
-                            talk.speaker = "DIFFERENT";
-                            break;
-                        default:
-                            talk.speaker = "Speaker " + speaker.ToString();
-                            break;
-                    }
-
-                    talk.words.Add(word);
+                        0 => "UNKOWN",
+                        -2 => "DIFFERENT",
+                        _ => "Speaker " + speaker.ToString(),
+                    };
+                    talk.Words.Add(word);
 
                 }
-                editmeeting.talks.Add(talk);
+                editmeeting.Talks.Add(talk);
             }
             return editmeeting;
         }

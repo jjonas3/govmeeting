@@ -1,26 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
+﻿using GM.Infrastructure.InfraCore.Identity;
+using GM.WebUI.WebApp.Features.Home;
+using GM.WebUI.WebApp.Features.Manage;
+using GM.WebUI.WebApp.Models.AccountViewModels;
+using GM.WebUI.WebApp.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.Extensions.Logging;
-using GM.WebApp.Models;
-using System.Diagnostics;
-using System.Text.RegularExpressions;
-using Microsoft.AspNetCore.Hosting;
-
-using GM.WebApp.Services;
-using GM.WebApp.Models.AccountViewModels;
-using GM.WebApp.Features.Home;
-using GM.WebApp.Features.Manage;
-using GM.DatabaseAccess;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Diagnostics;
+using System.Linq;
+using System.Security.Claims;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
-namespace GM.WebApp.Controllers
+namespace GM.WebUI.WebApp.Controllers
 {
     [Authorize]
     public class AccountController : Controller

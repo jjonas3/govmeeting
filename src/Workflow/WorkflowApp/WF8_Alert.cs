@@ -2,13 +2,15 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using GM.ViewModels;
 using Microsoft.Extensions.Options;
-using GM.Configuration;
+using GM.Application.Configuration;
 //using GM.DatabaseRepositories;
-using GM.DatabaseModel;
 using Microsoft.Extensions.Logging;
-using GM.DatabaseAccess;
+
+using GM.Application.AppCore.Entities.Govbodies;
+using GM.Application.AppCore.Entities.Meetings;
+using GM.Application.AppCore.Entities.Speakers;
+using GM.Application.AppCore.Entities.Topics;
 
 namespace GM.WorkflowApp
 {
@@ -17,24 +19,25 @@ namespace GM.WorkflowApp
     {
         readonly ILogger<WF8_Alert> logger;
         readonly AppSettings config;
-        readonly IDBOperations dBOperations;
+        ////readonly IDBOperations dBOperations;
 
         public WF8_Alert(
             ILogger<WF8_Alert> _logger,
-            IOptions<AppSettings> _config,
-            IDBOperations _dBOperations
+            IOptions<AppSettings> _config
+            ////IDBOperations _dBOperations
            )
         {
             logger = _logger;
             config = _config.Value;
-            dBOperations = _dBOperations;
+            ////dBOperations = _dBOperations;
         }
 
         // Find all meetings that have been loaded into the database.
         public void Run()
         {
 
-            List<Meeting> meetings = dBOperations.FindMeetings(null, WorkStatus.Loaded, true);
+            ////List<Meeting> meetings = dBOperations.FindMeetings(null, WorkStatus.Loaded, true);
+            List<Meeting> meetings = new List<Meeting>();   // TODO - CA
 
             foreach (Meeting meeting in meetings)
             {

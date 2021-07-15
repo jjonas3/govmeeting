@@ -9,12 +9,14 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgMaterialMultilevelMenuModule } from 'ng-material-multilevel-menu';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
+import { environment } from '../environments/environment';
+
+import { FetchDataComponent } from './fetch-data/fetch-data.component';
 
 // APP
 import { AppRoutingModule } from './app-routing.module';
 import { AboutProjectModule } from './about-project/about-project.module';
 import { AppComponent } from './app.component';
-import { AppData } from './appdata';
 
 // dashboard
 import { DashboardModule } from './dashboard/dashboard.module';
@@ -44,30 +46,33 @@ import { UserSettingsService, UserSettings, LocationType } from './common/user-s
 import { DemoMaterialModule } from './common/material';
 
 // services
-import { EdittranscriptService } from './features/edittranscript/edittranscript.service';
-import { EdittranscriptServiceStub } from './features/edittranscript/edittranscript.service-stub';
-import { ViewTranscriptService } from './features/viewtranscript/viewtranscript.service';
-import { ViewTranscriptServiceStub } from './features/viewtranscript/viewtranscript.service-stub';
 import { ChatService } from './features/chat/chat.service';
 import { DataFactoryService } from './work_experiments/datafake/data-factory.service';
+
+// Swagger API
+import { GovLocationClient, GovbodyClient } from './apis/api.generated.clients';
 
 // EXPERIMENTS
 import { PopupComponent } from './work_experiments/popup/popup.component';
 import { DataFakeService } from './work_experiments/datafake/data-fake.service';
-import { loadConfiguration } from './work_experiments/configuration/loadConfiguration';
-import { ConfigService } from './work_experiments/configuration/config.service';
+// import { loadConfiguration } from './work_experiments/configuration/loadConfiguration';
+// import { ConfigService } from './work_experiments/configuration/config.service';
 import { ShoutoutsComponent } from './work_experiments/shoutouts/shoutouts';
-import { RegisterComponent } from './work_experiments/register/register';
 
-const isAspServerRunning = false; // Is the Asp.Nnet server running?
-const isBeta = false; // Is this the beta release version?
-const isLargeEditData = false; // Are we using the large data for EditTranscript? (Little Falls, etc.)
+///// Initialization service and ServiceManager Module
+import { AppInitService } from './appinit/appinit.service';
+import { ServiceManagerModule } from './appinit/service-manager.module';
+import { VideoService } from './common/video/video.service';
+import { VideoServiceStub } from './common/video/video.service-stub';
+import { VideoServiceReal } from './common/video/video.service-real';
+export function pingFactory(appInitService: AppInitService) {
+  return () => appInitService.pingServer();
+}
 
 @NgModule({
   imports: [
     // /////////////// external //////////////
     RouterModule.forRoot([]),
-    RouterModule,
     CommonModule,
     BrowserAnimationsModule,
     DemoMaterialModule,
@@ -76,6 +81,9 @@ const isLargeEditData = false; // Are we using the large data for EditTranscript
     ReactiveFormsModule,
     NgMaterialMultilevelMenuModule,
     HttpClientModule,
+    //////////////////////////////////////////
+    ServiceManagerModule.forRoot(),
+    //////////////////////////////////////////
 
     // /////////////// internal //////////////
     ViewTranscriptModule,
@@ -93,8 +101,9 @@ const isLargeEditData = false; // Are we using the large data for EditTranscript
     HeaderModule,
     AmchartsModule,
     FeaturesModule,
+    //  AppInitModule,
   ],
-  declarations: [AppComponent, DashMainComponent, ShoutoutsComponent, RegisterComponent, PopupComponent],
+  declarations: [AppComponent, DashMainComponent, ShoutoutsComponent, PopupComponent, FetchDataComponent],
   exports: [
     DemoMaterialModule,
 
@@ -108,44 +117,25 @@ const isLargeEditData = false; // Are we using the large data for EditTranscript
     // BarChartComponent
   ],
   providers: [
-    // {
-    // EXPERIMENTAL - trying to find a way to load config from a file and use
-    //   the settings here in app.module.ts
-    // This loads the ConfigureService with the contents of assets/config.json
-    // Using APP_INITIALIZER forces the app to wait until the loading is complete.
-    //   provide: APP_INITIALIZER,
-    //   useFactory: loadConfiguration,
-    //   deps: [
-    //     HttpClient,
-    //     ConfigService
-    //   ],
-    //   multi: true
-    // },
     ErrorHandlingService,
-    AppData,
+    // AppData,
+    // The APP_INITIALIZER runs before application start.
+    // It checks if the server is running. ServiceManager uses its result
+    // to decide whether to provide real or stub API services.
     {
-      provide: AppData,
-      // This method works for reading config setting from index.html. We can define APP_DATA in index.html.
-      // useValue: window['APP_DATA']    // Get settings from html
-      useValue: { isAspServerRunning, isBeta, isLargeEditData },
+      provide: APP_INITIALIZER,
+      useFactory: pingFactory,
+      deps: [AppInitService],
+      multi: true,
     },
-    {
-      provide: EdittranscriptService,
-      useClass: isAspServerRunning ? EdittranscriptService : EdittranscriptServiceStub,
-    },
-
-    // If you use the stubs for these services, they will not call the Asp.Net server,
-    // but will instead return static data.
-    {
-      provide: ViewTranscriptService,
-      useClass: isAspServerRunning ? ViewTranscriptService : ViewTranscriptServiceStub,
-    },
-    // { provide: ViewTranscriptService, useClass: ViewTranscriptServiceStub },
-
     ChatService,
     DataFactoryService,
     DataFakeService,
     UserSettingsService,
+
+    // Swagger API
+    GovLocationClient,
+    GovbodyClient,
   ],
   bootstrap: [AppComponent],
 })

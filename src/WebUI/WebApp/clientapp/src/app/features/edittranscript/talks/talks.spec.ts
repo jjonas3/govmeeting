@@ -1,11 +1,10 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 import { Observable, of } from 'rxjs';
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 
-import { EdittranscriptService } from '../edittranscript.service';
+import { EditTranscriptService } from '../edittranscript.service';
 import { EditTranscript, EditTranscriptSample } from '../../../models/sample-data/edittranscript-sample';
 import { TalksComponent } from './talks';
-import { Talk } from '../../../models/addtags-view';
 
 // Create a stub for EdittranscriptService
 class ServiceStub {
@@ -26,12 +25,14 @@ describe('TalksComponent', () => {
   let component: TalksComponent;
   let fixture: ComponentFixture<TalksComponent>;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [TalksComponent, TopicsComponent],
-      providers: [{ provide: EdittranscriptService, useClass: ServiceStub }],
-    }).compileComponents();
-  }));
+  beforeEach(
+    waitForAsync(() => {
+      TestBed.configureTestingModule({
+        declarations: [TalksComponent, TopicsComponent],
+        providers: [{ provide: EditTranscriptService, useClass: ServiceStub }],
+      }).compileComponents();
+    })
+  );
 
   beforeEach(() => {
     fixture = TestBed.createComponent(TalksComponent);

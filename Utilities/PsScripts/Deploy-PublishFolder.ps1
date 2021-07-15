@@ -20,9 +20,11 @@ function Main
         [Parameter(Position = 2)] [string] $secrets
     )
    
+    $WORKSPACE_ROOT = "C:\GOVMEETING\_SOURCECODE"
+
     # If no params passed and repo is installed in C:\GOVMEETING|_SOURCECODE
-    if ($publish -eq "") { $publish = "C:\GOVMEETING\_SOURCECODE\BackEnd\WebApp\bin\release\netcoreapp2.2\publish" }
-    if ($secrets -eq ""){ $secrets = "C:\GOVMEETING\SECRETS\" }
+    if ($publish -eq "") { $publish = $WORKSPACE_ROOT + "\src\WebUI\WebApp\bin\release\netcoreapp2.2\publish" }
+    if ($secrets -eq ""){ $secrets = $WORKSPACE_ROOT + "\SECRETS\" }
 
     $devSettings = GetFullPath ($secrets + "\appsettings.Development.json")
     $prodSettings = GetFullPath ($secrets + "\appsettings.Production.json")

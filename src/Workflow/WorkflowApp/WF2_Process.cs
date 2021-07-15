@@ -1,21 +1,16 @@
-﻿using System;
+﻿using ChinhDo.Transactions;
+using GM.Application.AppCore.Entities.Meetings;
+using GM.Application.Configuration;
+//using GM.Application.ProcessRecording;
+using GM.Application.ProcessTranscript;
+//using GM.Infrastructure.FileDataRepositories;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
-//using GM.ProcessRecording;
-using GM.ProcessTranscript;
-using GM.ViewModels;
-using Microsoft.Extensions.Options;
-using GM.Configuration;
-//using GM.FileDataRepositories;
-using GM.DatabaseModel;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
-using GM.Utilities;
-using ChinhDo.Transactions;
 using System.Transactions;
-using GM.FileDataRepositories;
-using GM.DatabaseAccess;
+
+#pragma warning disable CS0219
 
 namespace GM.WorkflowApp
 {
@@ -24,7 +19,7 @@ namespace GM.WorkflowApp
         readonly ILogger<WF2_Process> logger;
         readonly AppSettings config;
         readonly ITranscriptProcess transcriptProcess;
-        readonly IDBOperations dBOperations;
+        ////readonly IDBOperations dBOperations;
 
         //readonly IFileRepository fileRepository;
 
@@ -34,14 +29,14 @@ namespace GM.WorkflowApp
         public WF2_Process(
             ILogger<WF2_Process> _logger,
             IOptions<AppSettings> _config,
-            ITranscriptProcess _transcriptProcess,
-            IDBOperations _dBOperations
+            ITranscriptProcess _transcriptProcess
+            ////IDBOperations _dBOperations
            )
         {
             logger = _logger;
             config = _config.Value;
             transcriptProcess = _transcriptProcess;
-            dBOperations = _dBOperations;
+            ////dBOperations = _dBOperations;
 
             // This is for if we need to debug a Github Actions issue.
             //ILoggerFactory loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
@@ -55,7 +50,8 @@ namespace GM.WorkflowApp
             bool? isApproved = true;        // We want only the received transcripts that were approved.
             if (!config.RequireManagerApproval) isApproved = null;  // unless the config setting says otherwise.
 
-            List<Meeting> meetings = dBOperations.FindMeetings(SourceType.Transcript, WorkStatus.Received, isApproved);
+            ////List<Meeting> meetings = dBOperations.FindMeetings(SourceType.Transcript, WorkStatus.Received, isApproved);
+            List<Meeting> meetings = new List<Meeting>();   // TODO - CA
 
             foreach (Meeting meeting in meetings)
             {
@@ -65,7 +61,8 @@ namespace GM.WorkflowApp
 
         private void DoWork(Meeting meeting)
         {
-            string workfolderName = dBOperations.GetWorkFolderName(meeting);
+            ////string workfolderName = dBOperations.GetWorkFolderName(meeting);
+            string workfolderName = "kjkjkjkjkoou9ukj";  // TODO - CA
 
             string workFolderPath = Path.Combine(config.DatafilesPath, workfolderName);
             string processedFile = Path.Combine(workFolderPath, WorkfileNames.processedTranscript);
@@ -78,7 +75,7 @@ namespace GM.WorkflowApp
                 meeting.WorkStatus = WorkStatus.Processing;
                 meeting.Approved = false;
 
-                dBOperations.WriteChanges();
+                ////dBOperations.WriteChanges();
 
                 scope.Complete();
             }
@@ -92,7 +89,7 @@ namespace GM.WorkflowApp
                 meeting.WorkStatus = WorkStatus.Processed;
                 meeting.Approved = false;
 
-                dBOperations.WriteChanges();
+                ////dBOperations.WriteChanges();
                 scope.Complete();
             }
         }

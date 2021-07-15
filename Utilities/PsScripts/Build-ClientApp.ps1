@@ -1,5 +1,4 @@
 ﻿# Build-ClientApp.ps1
-# If the location of ClientApp is not passed
 # The location of the ClientApp relative to the WebApp is passed as "$source".
 
 Function Main
@@ -23,7 +22,7 @@ Function Main
     }
 
     npm install
-    npm run build
+    npm run build:prod
 
     if ($clientapp -ne "") {
       Pop-Location

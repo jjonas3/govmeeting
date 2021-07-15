@@ -1,74 +1,76 @@
-﻿using System;
-using System.IO;
-using Microsoft.Extensions.Options;
-using GM.Configuration;
-using GM.FileDataRepositories;
-//using GM.DatabaseRepositories;
-using GM.DatabaseModel;
-using System.Collections.Generic;
-using System.ComponentModel;
-using GM.DatabaseAccess;
+﻿using ChinhDo.Transactions;
+using GM.Application.AppCore.Entities.Govbodies;
+using GM.Application.AppCore.Entities.Meetings;
+using GM.Application.Configuration;
+using GM.Infrastructure.GetOnlineFiles;
+////using GM.Infrastructure.InfraCore.Data;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using System;
+//using GM.DatabaseRepositories;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using GM.GetOnlineFiles;
 using System.Transactions;
-using ChinhDo.Transactions;
+
 
 namespace GM.WorkflowApp
 {
     public class WF1_Retrieve
     {
-        // TODO - IMPLEMENT THIS CLASS
+        // TODO - Complete Implementation of this class
 
         /*   ===== RetrieveOnlineFiles will:
-         * Read the meeting schedules of each GovBody in the database.
+         * Read the meeting schedules of each Govbody in the database.
          * If a current meeting may have taken place, it will:
          *    Check the website where either its transcript or a recording may be found.
          *    If found it will:
          * Start the file retrieval.
          * Store the retieved file in the "DATAFILES/RECEIVED" folder.
-         * Create a new Meeting record for the GovBody
+         * Create a new Meeting record for the Govbody
          * Set the Meeting WorkStatus property to "Received"
          * Set the Meeting Approved property to false".
-         * Send the GovBody managers a "RECEIVED" message.
+         * Send the Govbody managers a "RECEIVED" message.
          * Repeat for each government body.
          *
-         *  New meetings can also added to a GovBody by:
+         *  New meetings can also added to a Govbody by:
          *      * the phone app for recording a meeting
          *      * a file being uploaded by a registered user with appropriate rights.
          */
 
         readonly ILogger<WF1_Retrieve> logger;
         readonly AppSettings config;
-        readonly IDBOperations dBOperations;
+        ////readonly IDBOperations dBOperations;
         readonly IRetrieveNewFiles retrieveNewFiles;
 
         public WF1_Retrieve(
             ILogger<WF1_Retrieve> _logger,
             IOptions<AppSettings> _config,
-            IDBOperations _dBOperations,
+            ////IDBOperations _dBOperations,
             IRetrieveNewFiles _retrieveNewFiles
            )
         {
             logger = _logger;
             config = _config.Value;
-            dBOperations = _dBOperations;
+            ////dBOperations = _dBOperations;
             retrieveNewFiles = _retrieveNewFiles;
         }
 
         public void Run()
         {
-            List<GovBody> govBodies = dBOperations.FindGovBodiesWithScheduledMeetings();
+            ////List<Govbody> govBodies = dBOperations.FindGovBodiesWithScheduledMeetings();
+            List<Govbody> govBodies = new List<Govbody>();  // TODO - implement
 
-            foreach (GovBody govBody in govBodies)
+            foreach (Govbody govBody in govBodies)
             {
                 DoWork(govBody);
             }
         }
 
-        private void DoWork(GovBody govBody)
+        private void DoWork(Govbody govBody)
         {
-            List<ScheduledMeeting> scheduled = govBody.ScheduledMeetings;
+            //List<ScheduledMeeting> scheduled = govBody.ScheduledMeetings;
+            IReadOnlyCollection<ScheduledMeeting> scheduled = govBody.ScheduledMeetings;
 
             // Get all meetings that have should occured
             IEnumerable<ScheduledMeeting> results = scheduled.Where(
@@ -90,11 +92,8 @@ namespace GM.WorkflowApp
                 string sourceFilename = "source" + extension;
                 string sourceFilePath = Path.Combine(workFolderPath, sourceFilename);
 
-                Meeting meeting = new Meeting();
                 // Create the meeting record
-                meeting.SourceType = type;
-                meeting.SourceFilename = sourceFilename;
-                meeting.Date = actualDate;
+                Meeting meeting = new Meeting(actualDate, type, sourceFilename);
                 meeting.WorkStatus = WorkStatus.Received;
                 meeting.Approved = false;
 
@@ -104,8 +103,9 @@ namespace GM.WorkflowApp
                 {
                     Directory.CreateDirectory(workFolderPath);
                     fileMgr.Copy(retrievedFile, sourceFilePath, true);
-                    dBOperations.Add(meeting);
-                    dBOperations.WriteChanges();
+                    //// TODO - implement
+                    ////dBOperations.Add(meeting);
+                    ////dBOperations.WriteChanges();
                     scope.Complete();
                 }
 

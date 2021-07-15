@@ -2,16 +2,13 @@
 using Newtonsoft.Json;
 using System.IO;
 using Microsoft.Extensions.Options;
-using GM.ViewModels;
-using GM.Configuration;
-using GM.DatabaseModel;
-using GM.Utilities;
-using GM.DatabaseAccess;
+using GM.Application.Configuration;
+////using GM.Infrastructure.InfraCore.Data;
 
-namespace GM.FileDataRepositories
+namespace GM.Infrastructure.FileDataRepositories.ViewMeetings
 {
-    // This is a "repository" of "viewable" transcripts. Viewable transcripts are the JSON files generated after  
-    //  the tags are added.
+    // This is a "repository" of "viewable" transcripts. Viewable transcripts are the
+    // JSON files generated after the tags are added.
 
     public class ViewMeetingRepository : IViewMeetingRepository
     {
@@ -19,48 +16,43 @@ namespace GM.FileDataRepositories
         const string WORK_FILE_NAME = "ToView.json";
 
         private readonly AppSettings _config;
-        readonly IDBOperations dBOperations;
 
         public ViewMeetingRepository(
-            IOptions<AppSettings> config,
-            IDBOperations _dBOperations
+            IOptions<AppSettings> config
             )
         {
             _config = config.Value;
-            dBOperations = _dBOperations;
         }
 
-        public TranscriptViewModel Get(long meetingId)
+        public string Get(long meetingId)
         {
             string workFolderPath = GetWorkFolderPath(meetingId);
 
             CircularBuffer cb = new CircularBuffer(workFolderPath, WORK_FILE_NAME, _config.MaxWorkFileBackups);
             string latestFixes = cb.GetLatest();
 
-            TranscriptViewModel viewMeeting = JsonConvert.DeserializeObject<TranscriptViewModel>(latestFixes);
-            return viewMeeting;
+            return latestFixes;
         }
 
-        public bool Put(long meetingId, TranscriptViewModel value)
+        public bool Put(long meetingId, string meeting)
         {
             string workFolderPath = GetWorkFolderPath(meetingId);
 
-            string stringValue = JsonConvert.SerializeObject(value, Formatting.Indented);
-
             CircularBuffer cb = new CircularBuffer(workFolderPath, WORK_FILE_NAME, _config.MaxWorkFileBackups);
-            bool result = cb.WriteLatest(stringValue);
+            bool result = cb.WriteLatest(meeting);
 
             return result;
         }
 
         private string GetWorkFolderPath(long meetingId)
         {
-            Meeting meeting = dBOperations.GetMeeting(meetingId);
+            return "kjjljkjkj"; // TODO - CA
+            ////Meeting meeting = dBOperations.GetMeeting(meetingId);
 
-            string workfolderName = dBOperations.GetWorkFolderName(meeting);
+            ////string workfolderName = dBOperations.GetWorkFolderName(meeting);
 
-            string workFolder = Path.Combine(_config.DatafilesPath, workfolderName, SUB_WORK_FOLDER);
-            return workFolder;
+            ////string workFolder = Path.Combine(_config.DatafilesPath, workfolderName, SUB_WORK_FOLDER);
+            ////return workFolder;
         }
 
     }

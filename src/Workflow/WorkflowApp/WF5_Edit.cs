@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using GM.Application.AppCore.Entities.Meetings;
+using GM.Application.Configuration;
 using Microsoft.Extensions.Options;
-using GM.Configuration;
-using Newtonsoft.Json;
-using GM.FileDataRepositories;
-using GM.ViewModels;
-using GM.DatabaseModel;
-using GM.EditTranscript;
-using GM.DatabaseAccess;
+using System.Collections.Generic;
+
+#pragma warning disable CS0219
 
 namespace GM.WorkflowApp
 {
@@ -16,26 +11,28 @@ namespace GM.WorkflowApp
     public class WF5_Edit
     {
         readonly AppSettings config;
-        readonly IDBOperations dBOperations;
+        ////readonly IDBOperations dBOperations;
 
         public WF5_Edit(
-            IOptions<AppSettings> _config,
-            IDBOperations _dBOperations
+            IOptions<AppSettings> _config
+            ////IDBOperations _dBOperations
             )
         {
             config = _config.Value;
-            dBOperations = _dBOperations;
+            ////dBOperations = _dBOperations;
         }
 
         public void Run()
         {
-            List<Meeting> transcribedMeetings = dBOperations.FindMeetings(SourceType.Recording, WorkStatus.Transcribed, true);
+            ////List<Meeting> transcribedMeetings = dBOperations.FindMeetings(SourceType.Recording, WorkStatus.Transcribed, true);
+            List<Meeting> transcribedMeetings = new List<Meeting>();   // TODO - CA
             foreach (Meeting meeting in transcribedMeetings)
             {
                 StartEditing(meeting);
             }
 
-            List<Meeting> proofreadingMeetings = dBOperations.FindMeetings(SourceType.Recording, WorkStatus.Editing, null);
+            ////List<Meeting> proofreadingMeetings = dBOperations.FindMeetings(SourceType.Recording, WorkStatus.Editing, null);
+            List<Meeting> proofreadingMeetings = new List<Meeting>();   // TODO - CA
             foreach (Meeting meeting in proofreadingMeetings)
             {
                 CheckIfEditingCompleted(meeting);
@@ -69,9 +66,9 @@ namespace GM.WorkflowApp
             bool b = true;
             if (b) return;
 
-            FixasrViewModel fixasr = JsonConvert.DeserializeObject<FixasrViewModel>(fixasrText);
-            FormatConversions formatConversions = new FormatConversions();
-            AddtagsViewModel addtags = formatConversions.ConvertFixasrToAddtags(fixasr);
+            //FixasrViewModel fixasr = JsonConvert.DeserializeObject<FixasrViewModel>(fixasrText);
+            //FormatConversions formatConversions = new FormatConversions();
+            //AddtagsViewModel addtags = formatConversions.ConvertFixasrToAddtags(fixasr);
 
             //addtagsRepository.Put(addtags, meeting.Id);
 
@@ -79,7 +76,8 @@ namespace GM.WorkflowApp
 
         private void CheckIfEditingCompleted(Meeting meeting)
         {
-            string workfolderName = dBOperations.GetWorkFolderName(meeting);
+            ////string workfolderName = dBOperations.GetWorkFolderName(meeting);
+            string workfolderName = "kjkjkjkjkoou9ukj";  // TODO - CA
             string workFolderPath = config.DatafilesPath + workfolderName;
 
             // TODO - When all of the tagging for a specific transcript is completed, it should:

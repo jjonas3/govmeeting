@@ -1,7 +1,8 @@
-﻿using GM.DatabaseModel;
-using System;
+﻿using System;
+using GM.Application.AppCore.Entities.Govbodies;
+using GM.Application.AppCore.Entities.Meetings;
 
-namespace GM.GetOnlineFiles
+namespace GM.Infrastructure.GetOnlineFiles
 {
 
     /* This is a placeholder for code to be written for retrieving transcripts or recordings from a remote site.
@@ -11,12 +12,12 @@ namespace GM.GetOnlineFiles
 
     public interface IRetrieveNewFiles
     {
-        public string RetrieveFile(GovBody govbody, DateTime scheduled, out DateTime actual, out SourceType type);
+        public string RetrieveFile(Govbody govbody, DateTime scheduled, out DateTime actual, out SourceType type);
     }
 
     public class RetrieveNewFiles : IRetrieveNewFiles
     {
-        public string RetrieveFile(GovBody govbody, DateTime scheduled, out DateTime actual, out SourceType type)
+        public string RetrieveFile(Govbody govbody, DateTime scheduled, out DateTime actual, out SourceType type)
         {
             // TODO - implement
             actual = DateTime.Now;

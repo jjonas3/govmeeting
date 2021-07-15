@@ -1,52 +1,60 @@
-using System;
-using System.IO;
+using GM.Application.Configuration;
+using GM.Infrastructure.InfraCore.Data;
+using GM.WebUI.WebApp.Services;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using NLog.Web;
-using GM.Utilities;
 
-
-namespace GM.WebApp
+namespace GM.WebUI.WebApp
 {
     public class Program
     {
+        static IWebHostEnvironment _Env;
+
         public static void Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
+            var host = CreateHostBuilder(args).Build();
+
+            // If development, migrate and seed the database.
+            // Migrate() also creates the database if it does not exist.
+            if (_Env.IsDevelopment())
+            {
+                using (var scope = host.Services.CreateScope())
+                {
+                    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                    db.Database.Migrate();
+
+                    var seedDatabase = scope.ServiceProvider.GetRequiredService<ISeedDatabase>();
+                    seedDatabase.Seed();
+
+                    // This auth code needs re-work.
+                    //var seedDbUsers = scope.ServiceProvider.GetRequiredService<ISeedAuth>();
+                    //seedDbUsers.Seed();
+                }
+            }
+
+            host.Run();
         }
 
-        // CreateDefaultBuilder would normally add both appsettings.json and the appsettings for our current environment.
-        // But our appsettings.Development.json is in the secrets folder, so we need to specifically add it here.
-        // When we deploy to production, we upload appsettings.Production.json from the secrets folder.
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
             .ConfigureWebHostDefaults(webBuilder =>
             {
                 webBuilder.UseStartup<Startup>()
-                .ConfigureAppConfiguration((hostingContext, config) =>
+                .ConfigureAppConfiguration((hostingContext, config) => 
                 {
-                    var env = hostingContext.HostingEnvironment;
-                    if (env.IsDevelopment())
-                    {
-                        // If development, include SECRETS/appsettings.Development.json in the configuration.
-                        // This file contains the keys for using reCaptcha and Google external authorization.
-                        string secretsFolder = GMFileAccess.GetSolutionSiblingFolder("SECRETS");
-                        string devSettingFile = secretsFolder + "/" + $"appsettings.{env.EnvironmentName}.json";
-                        if (File.Exists(devSettingFile))
-                        {
-                            config.AddJsonFile(devSettingFile, optional: true, reloadOnChange: true);
-                        }
-                    }
+                    _Env = hostingContext.HostingEnvironment;
+                    BuildConfig.Build(config, _Env.EnvironmentName);
                 })
-            .ConfigureLogging(logging =>
-            {
-                logging.ClearProviders();
-                logging.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace);
-            })
-            .UseNLog();  // NLog: setup NLog for Dependency injection
+                .ConfigureLogging(logging =>
+                {
+                    logging.ClearProviders();
+                    logging.SetMinimumLevel(LogLevel.Trace);
+                })
+                .UseNLog();  // NLog: setup NLog for Dependency injection
             });
-
     }
 }

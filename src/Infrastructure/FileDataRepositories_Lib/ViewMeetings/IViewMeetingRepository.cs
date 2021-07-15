@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GM.ViewModels;
 
 
-namespace GM.FileDataRepositories
+namespace GM.Infrastructure.FileDataRepositories.ViewMeetings
 {
     public interface IViewMeetingRepository
     {
-        TranscriptViewModel Get(long meetingId);
+        public string Get(long meetingId);
+        public bool Put(long meetingId, string meeting);
     }
 }

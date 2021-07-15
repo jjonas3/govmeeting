@@ -4,9 +4,10 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text;
-using GM.ViewModels;
+using GM.Application.AppCore.Entities.Meetings;
+using GM.Application.DTOs.Meetings;
 
-namespace GM.EditTranscript
+namespace GM.Application.EditTranscript
 {
     ///* Split the fixasr JSON object into segments.
     // *  {
@@ -24,7 +25,7 @@ namespace GM.EditTranscript
         //    int sectionNumber;
         //    readonly FixasrView[] fixasrSegment = new FixasrView[2];
 
-        public void Split(FixasrViewModel fixasr, string outputFolder, int sectionSize, int overlap, int parts)
+        public void Split(EditMeeting_Dto meetingEditDto, string outputFolder, int sectionSize, int overlap, int parts)
         {
             //        fixasrSegment[0] = new FixasrView();
             //        fixasrSegment[1] = new FixasrView();

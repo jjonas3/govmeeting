@@ -6,7 +6,7 @@ using GM.Utilities;
 using Google.Protobuf.Collections;
 
 
-namespace DevelopTranscription
+namespace GM.Utilities.DevelopTranscription
 {
     public class SampleVideo
     {
@@ -24,7 +24,6 @@ namespace DevelopTranscription
             path = _path;
         }
     }
-
 
     public class SampleVideos
     {

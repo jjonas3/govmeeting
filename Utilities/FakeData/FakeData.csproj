@@ -5,6 +5,10 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <WarningsAsErrors>NU1605</WarningsAsErrors>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Bogus" Version="30.0.4" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
@@ -12,8 +16,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Domain\DatabaseModel_Lib\DatabaseModel_Lib.csproj" />
-    <ProjectReference Include="..\..\src\WebUI\ViewModels_Lib\ViewModels_Lib.csproj" />
+    <ProjectReference Include="..\..\src\Application\Core_Lib\AppCore_Lib.csproj" />
+    <ProjectReference Include="..\..\src\Application\DTOs_Lib\DTOs_Lib.csproj" />
   </ItemGroup>
 
 </Project>

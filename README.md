@@ -56,7 +56,7 @@ People will then be able to:
 Enough with the jibber-jabber, fool!
 Show me how it works!
 
-Well, the work is in progress. But click here for:  [Demos of some working code](https://govmeeting.org/dashboard) and more documentation.
+Well, the work is in progress. But click here for:  [Demos of some working code](https://govmeeting.github.io/govmeeting/dashboard) and more documentation.
 
 <h4>
 <div  style="float:left;">  
@@ -70,66 +70,120 @@ Well, the work is in progress. But click here for:  [Demos of some working code]
 
 # Contents
 
-- <a href="#QuickStart"> Quick Start </a>
-- <a href="#DevelopVsCode"> Develop with VsCode </a>
-- <a href="#DevelopVS"> Develop with Visual Studio </a>
-- <a href="#DevelopOther"> Develop on other platforms </a>
+- <a href="#Installation"> Installation </a>
+- <a href="#BuildRun"> Build/Run </a>
+- <a href="#DevelopVS"> Visual Studio </a>
+- <a href="#DevelopVsCode"> VsCode </a>
+- <a href="#CommandLine"> Command Line </a>
 - <a href="#Database"> Database </a>
 - <a href="#GoogleCloud"> Google Cloud Platform </a>
 - <a href="#GoogleApi"> Google API Keys </a>
 
 ---
 
-<a name="QuickStart"></a>
+<a name="Installation"></a>
 
-# Quick Start <br/>
+# Installation <br/>
 
-<a href="#QuickStart"> [Contents] </a>
+<a href="#Contents"> [Contents] </a>
 
 ## Clone project
 
 - Install git: <a href="https://gitforwindows.org"> Git for Windows </a>, <a href="https://git-scm.com/download/mac"> Git for Mac </a>
-- > git clone https://github.com/govmeeting/govmeeting.git
+- git clone https://github.com/govmeeting/govmeeting.git
 
-But to contribute, it's better to fork the project at https://github.com/govmeeting/govmeeting and clone your fork.
-
-## Build and run Angular client
+  [ To contribute, it's better to fork and clone your fork in Github. ]
 
 - Install <a href="https://nodejs.org/en/download/"> Node.js. </a>
-- > cd govmeeting/frontend/clientapp
-- > npm install
-- > npm start
-- Open brower to localhost:4200.
-
-## Build and run .Net Web API server
-
 - Install <a href="https://dotnet.microsoft.com/download"> .Net Core SDK. </a>
-- Leave Angular client running, but close browser.
-- > cd govmeeting/BackEnd/WebApp
-- > dotnet build
-- > dotnet run bin\Debug\netcoreapp3.1/WebApp.dll
-- Browser will automatically open to localhost:5000.
+- Install <a href="https://www.ffmpeg.org"> FFmpeg. </a>. This is for processing audio & video files.
 
-## Build all .Net projects
+---
 
-- > cd govmeeting
-- > dotnet build
+<a name="BuildRun"></a>
 
-Besides the Web API server, there are the following .Net projects:
+# Development Procedures <br/>
 
-- WorkflowApp - This backend process retrieves and processes online transcripts and videos
-  of meetings, extracts the data and loads it into the database.
-- Utility programs - Under govmeeting/utilities are useful programs for development.
+<a href="#Contents"> [Contents] </a>
+
+## Three Applications
+
+There are three separate applications:
+
+- ClientApp - the front end UI app in Typescript & Angular.
+- WebApp - the backend Web API server in C# & Asp.Net Core.
+- WorkflowApp - the backend batch processing app in C# & .Net Core.
+
+When ClientApp starts, it checks whether WebApp is running. If not, it uses test data, instead of making API calls to the backend. This allows frontend code to be developed independently.
+
+WorkflowApp runs as a standalone process. It:
+
+- Downloads new meeting videos and transcripts.
+- Uploads videos to Google Speech Services for auto transciption
+- Processes transcripts for data extraction
+
+## Development environments
+
+Depending on your preference, you can build, run and develop using:
+
+- Visual Studio
+- VsCode
+- Command Line
+
+Below are procedures for each of these.
+
+---
+
+<a name="DevelopVS"></a>
+
+# Using Visual Studio <br/>
+
+<a href="#Contents"> [Contents] </a>
+
+- Install the free <a href="https://visualstudio.microsoft.com/free-developer-offers/"> Visual Studio Community Edition. </a>
+- During installation, select both the "ASP.NET" and the ".NET desktop" workloads.
+- Install extensions: (all by Mads Kristensen)
+  - "NPM Task Runner"
+  - "Command Task Runner"
+  - "Markdown Editor"
+- Open the solution file "govmeeting.sln"
+
+## Build/Run clientapp & WebApp
+
+- To run clientapp, in Task Runner Explorer - Solution, run:
+  - Defaults -> install
+  - Defaults -> start
+- To run WebApp, in Solution Explorer, set startup project to "WebApp"
+- Press F5 (debug) or Ctrl-F5 (run without debugging)
+- WebApp will start and a browser will open, displaying the clientapp.
+
+**Notes:**
+
+If you only run clientapp, you can open a browser to "localhost:4200" to see the app. Clientapp will recognize that WebApp is not running and it will use internal test data.
+
+But if you also run WebApp, WebApp will open a browser automatically to "localhost:44333" and display the clientapp. In this case it is using a proxy to the dev server running on "localhost:4200".
+
+## Build/Run WorkflowApp
+
+- Set startup project to "WorkflowApp"
+- Press F5 (debug) or Ctrl-F5 (run without debugging)
+
+## Run Tests
+
+In Task Runner Explorer - Solution, run either:
+
+- Defaults -> test - to run all tests in watch mode
+- Custom -> testOnce - to run all tests once
 
 ---
 
 <a name="DevelopVsCode"></a>
 
-# Developing with Visual Studio Code <br/>
+# Using Visual Studio Code<br/>
 
 <a href="#Contents"> [Contents] </a>
 
-## Install and setup VsCode
+## Install VsCode
 
 - Install <a href="https://code.visualstudio.com/download"> Visual Studio Code </a> and start it.
 - Install these extensions using the extensions panel on the left:
@@ -139,43 +193,115 @@ Besides the Web API server, there are the following .Net projects:
   - "Todo Tree" by Gruntfuggly - shows TODO lines in code (optional)
   - "Powershell" by Microsoft - for debugging Powershell build scripts (optional)
 
-## Build/run/debug Angular client
+## Build/Run ClientApp
+
+This is the Anglar front end SPA.
 
 - Open the project folder in VsCode
 - Open a terminal pane
-- > cd frontend/clientapp
-- > npm install
-- > npm start
-- To debug, set debug launch configuration to "clientapp Standalone"and press F5.
+- &gt; cd src/WebUI/WebApp/clientapp
+- &gt; npm install
+- &gt; npm start
+- Open a browser to localhost:4200
 
-By default, clientapp will call stub services instead of calling the WebApp API.
+## Debug ClientApp
 
-## Build/run/debug .Net Web API server
+- &gt; npm start
+- In the debug panel, set launch configuration "clientApp standalone"
+- Press F5 (debug) or Ctrl-F5 (run without debugging)
+- This will open a browser automatically.
 
-- Select menu item View -> Command Pallete (or ctrl-shift-P)
-- Select "Tasks: Run Task" -> "build-webapp"
+## Build .NET projects
+
+- Install <a href="https://dotnet.microsoft.com/download"> .Net Core SDK. </a>
+- Select: View Menu -> Command Palette (Ctrl-shift-P) -> "Tasks: Run Task" ->
+- Select: "build-dotnet" &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; (to build all projects)
+- or Select: "build-webapp" &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; (to build webapp)
+- or Select: "build-workflowapp" &nbsp; &nbsp; &nbsp; (to build workflowapp)
+
+## Run/Debug WebApp
+
+This is the .NET Web API server.
+
 - In the debug panel, set launch configuration "WebApp"
 - Press F5 (debug) or Ctrl-F5 (run without debugging)
 
-## Debug Angular client and .Net server together
+## Run/Debug WebApp and ClientApp together
 
-- In frontend/clientapp/app.module.ts, change "isAspServerRunning" from false to true.
-- Start clientapp as above
-- In the debug panel, set launch configuration "WebApp & clientapp"
+- "Run Angular App" as described above
+- In the debug panel, set launch configuration "WebApp & ClientApp"
 - Press F5 (debug) or Ctrl-F5 (run without debugging)
-- Chrome browser will open. Ignore temporary message "Site can't be reached" and wait for clientapp to display.
+- A browser will automatically open and display the SPA at localhost:5000
+
+## Run/Debug WorkflowApp
+
+This standalone performs batch jobs such as downloading, processing and transcribing meeting recordings.
+
+- In the debug panel, set launch configuration "WorkflowApp"
+- Press F5 (debug) or Ctrl-F5 (without debugging)
 
 ## Notes
 
-- "Tasks: Run Task" -> "build-webapp" builds WebApp.
-- "Tasks: Run Task" -> "Build All" builds all .Net projects.
-- Before the builds, NuGet packages are installed. Check each terminal window for errors and re-run if needed. NuGet packages are installed aysnchronously and there is a known race condition bug.
-- When "isAspServerRunning" is set to true, clientapp call the WebApp API instead of the stub services.
-- clientapp is served by the webpack-dev-server. WebApp uses the Kestrel server. Kestrel proxies clientapp requests to the webpack-dev-server.
+- The first time that the .NET projects are built, the NuGet packages are installed. If errors occur, re-run the build. NuGet packages are installed aysnchronously and there is a known race condition bug.
+- During development, ClientApp is served by webpack-dev-server. WebApp API calls are served by the Kestrel server. Kestrel proxies all non-API requests to webpack-dev-server.
+
+---
+
+<a name="CommandLine"></a>
+
+# Command Line <br/>
+
+<a href="#Contents"> [Contents] </a>
+
+## ClientApp
+
+- &gt; cd govmeeting/src/WebUI/WebApp/clientapp
+- &gt; npm install
+- &gt; npm start
+- Open brower to localhost:4200.
+
+## WebApp
+
+This is the .NET Web API server.
+
+- Leave Angular client running, but close browser.
+- &gt; cd govmeeting/src/WebUI/WebApp
+- &gt; dotnet build
+- &gt; dotnet run
+- Browser will automatically open to localhost:5000.
+
+## Workflow App
+
+This standalone app performs batch jobs such as downloading, processing and transcribing meeting recordings.
+
+- &gt; cd govmeeting/src/Workflow/WorkflowApp
+- &gt; dotnet build
+- &gt; dotnet run
+
+## Build all .NET projects (including utilities)
+
+- &gt; cd govmeeting
+- &gt; dotnet build
+
+## Run tests
+
+### Typescript code
+
+- &gt; cd govmeeting/src/WebUI/WebApp/clientapp
+- &gt; npm run test:once &nbsp; &nbsp; &nbsp; ( run once )
+- &gt; npm run test &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ( run in watch mode )
+
+### C# Code
+
+- &gt; cd govmeeting/src/WebUI/WebApp/clientapp
+- &gt; dotnet test &nbsp; &nbsp; &nbsp; &nbsp; (ignore warnings about iTextSharp & NLog.Web)
+
+<!-- END OF README SECTION -->
+
+---
 
 # Run WorkflowApp
 
-- Install <a href="https://www.ffmpeg.org"> FFmpeg. </a>. This is for processing audio & video files.
 - Download the test files from <a href="https://drive.google.com/drive/folders/1_I8AEnMNoPud7XZ_zIYfyGbvy96b-PyN?usp=sharing"> Google Drive. </a>
 - In the debug panel, set launch configuration "WorkflowApp"
 - Press F5 (debug) or Ctrl-F5 (run without debugging)
@@ -200,7 +326,7 @@ Besides the test files on Google Drive, you can process your own recordings of m
 - Name the file as follows: "country_state_county_municipality_agency_language-code_date.mp4".
 - For example: "USA_ME_LincolnCounty_BoothbayHarbor_Selectmen_en_2017-01-09.mp4".
 - Put the file in "DATAFILES"
-- In BackEnd/WorkflowApp/appsettings.json, set the following properites:
+- In src/Workflow/WorkflowApp/appsettings.json, set the following properites:
   - "InitializeWithTestData": false
   - "RequireManagerApproval": false
 - Run WorkflowApp.
@@ -210,94 +336,6 @@ If you have an Google Account set up, it will transcribe the recording.
 ## Process new transcripts
 
 The goal is to eventually write code smart enough to process all transcript formats. But for now we need to add custom code for new formats. If your city, town, etc, produces transcripts of their meetings, it would be of great help if you contribute the code to handle those. Please see <a href="https://github.com/govmeeting/govmeeting/issues/93"> Github Issue #93 </a>
-
----
-
-<a name="DevelopVS"></a>
-
-# Develop with Visual Studio <br/>
-
-<a href="#Contents"> [Contents] </a>
-
-- Install the free <a href="https://visualstudio.microsoft.com/free-developer-offers/"> Visual Studio Community Edition. </a>
-- During installation, select both the "ASP.NET" and the ".NET desktop" workloads.
-- Install extensions: (all by Mads Kristensen)
-  - "NPM Task Runner"
-  - "Command Task Runner"
-  - "Markdown Editor"
-- Open the solution file "govmeeting.sln"
-
-## Run clientapp & WebApp
-
-- Download the sub-folders from <a href="https://drive.google.com/drive/folders/1_I8AEnMNoPud7XZ_zIYfyGbvy96b-PyN?usp=sharing"> Google Drive. </a> Put them in a sibling folder to the project named "TESTDATA"
-- In frontend/clientapp/app.module.ts, change "isAspServerRunning" from false to true.
-- In Task Runner Explorer
-  - Select: clientapp
-  - run "install"
-  - run "start"
-- Set startup project to "WebApp"
-- Press F5 (debug) or Ctrl-F5 (run without debugging)
-- WebApp will run and a browser will open, displaying the clientapp.
-
-NOTE: There is an issue with setting breakpoints in the Angular clientapp in Visual Studio. See: <a href="https://github.com/govmeeting/govmeeting/issues/80"> Github issue #80 </a>
-
-## Run WorkflowApp
-
-- Download the test files from Google Drive (see above)
-- Open the debug panel.
-- Set startup project to "WorkflowApp"
-- Press F5 (debug) or Ctrl-F5 (run without debugging)
-
-Note: See notes for WorkflowApp under "Visual Studio Code"
-
----
-
-<a name="DevelopOther"></a>
-
-# Develop with other tools <br/>
-
-<a href="#Contents"> [Contents] </a>
-
-In your profile, set the environment variable, ASPNETCORE_ENVIRONMENT, to "Development". This is used by WebApp and WorkflowApp.
-
-## Run clientapp
-
-Execute:
-
-- cd frontend/clientapp
-- npm install
-- npm start
-
-Go to localhost:4200 in your browser. The client app will load.
-Some features will not work until WebApp is running.
-
-## Run WebApp with clientapp
-
-Execute:
-
-- (do above: "Build & start clientapp")
-- cd ../../Backend/WebApp
-- dotnet build webapp.csproj
-- dotnet run bin/debug/dotnet2.2/webapp.dll
-
-Go to localhost:5000 in your browser. The client app will load.
-
-## Run clientapp standalone
-
-- In app.module.ts, change "isAspServerRunning" from true to false.
-- (do above: "Build & start clientapp")
-
-## Run WorkflowApp
-
-Execute:
-
-- cd Backend/WorkflowApp
-- dotnet build workflowapp.csproj
-- dotnet run bin/debug/dotnet2.0/workflowapp.dll
-
-Note: See notes for WorkflowApp under "Visual Studio Code"
-
-<!-- END OF README SECTION -->
 
 ---
 
@@ -329,7 +367,7 @@ appsettings.json.
 
 The database is built via the "code first" feature of Entity Framework Core. It examines the C# classes in the data model and automatically creates all tables and relations. There are two steps: (1) Create the "migrations" code for doing the update and (2) execute the update.
 
-- cd Backend/WebApp
+- cd src/WebUI/WebApp
 - dotnet ef migrations add initial --project ..\Database\DatabaseAccess_Lib
 - dotnet ef database update --project ..\Database\DatabaseAccess_Lib
 
@@ -422,7 +460,7 @@ Google provides developers with a free account which includes a credit (currentl
 
 ## Test Speech to Text transcription
 
-- Set the startup project in Visual Studio to `Backend/WorkflowApp`. Press F5.
+- Set the startup project in Visual Studio to `src/Workflow/WorkflowApp`. Press F5.
 
 - Copy (don't move) one of the sample MP4 files from testdata to DATAFILES/RECEIVED.
 
@@ -430,7 +468,7 @@ The program will now recognize that a new file has appeared and start processing
 The MP4 file will be moved to "COMPLETED" when done. You will see the results in
 sufolders, which were created in the "DATAFILES" directory.
 
-In appsettings.json, there is a property "RecordingSizeForDevelopment". It is currently
+In appsettings.json, there is a property "MaxRecordingSize". It is currently
 set to "180". This causes the transcription routine in ProcessRecording_Lib to process only the first 180 seconds of the recording.
 
 ---

@@ -6,29 +6,41 @@ import { EditTranscript, Talk, Word } from '../../models/edittranscript-view';
 import { EditTranscriptSample } from '../../models/sample-data/edittranscript-sample';
 import { ErrorHandlingService } from '../../common/error-handling/error-handling.service';
 import { AppData } from '../../appdata';
+import { EditTranscriptService } from './edittranscript.service';
 
-const UseFileData = false; // If true, get data from sample in EditTranscriptSample.ts, else from assets folder
+const UseImportData = false; // If true, get data from sample in EditTranscriptSample.ts, else from assets folder
 const urlTest = 'assets/stubdata/ToEdit.json';
-const urlTestLarge = 'assets/stubdata/LARGE/USA_NJ_Passaic_LittleFalls_TownshipCouncil_en_2020-06-20.json';
+const urlTestLarge = 'assets/DATA_IGNORED_BY_GIT/USA_NJ_Passaic_LittleFalls_TownshipCouncil_en_2020-06-20.json';
 const addtagsUrl = 'https://jsonplaceholder.typicode.com/posts'; // Use  jsonplaceholder service to test post requests
 
-const NoLog = true; // set to false for console logging
+const NoLog = false; // set to false for console logging
 
 @Injectable()
-export class EdittranscriptServiceStub {
+export class EditTranscriptServiceStub implements EditTranscriptService {
   private ClassName: string = this.constructor.name + ': ';
   postId;
-  observable: Observable<EditTranscript>;
+  observable: Observable<EditTranscript> = null;
   isLargeEditData: boolean;
   url: string;
+  http: HttpClient;
 
-  public constructor(private appData: AppData, private http: HttpClient, private errHandling: ErrorHandlingService) {
+  public constructor(
+    private appData: AppData,
+    private _http: HttpClient,
+    private errHandling: ErrorHandlingService //  private editTranscript: EditMeetingClient
+  ) {
     NoLog || console.log(this.ClassName + 'constructor');
+    this.http = _http;
     this.isLargeEditData = appData.isLargeEditData;
+    NoLog || console.log(this.ClassName, appData);
   }
 
   public getTalks(): Observable<EditTranscript> {
-    if (UseFileData) {
+    NoLog || console.log(this.ClassName + 'getTalks');
+    if (this.observable !== null) {
+      return this.observable;
+    }
+    if (UseImportData) {
       NoLog || console.log(this.ClassName + 'get from memory');
       return of(EditTranscriptSample);
     }

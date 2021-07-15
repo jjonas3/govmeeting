@@ -1,14 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using Bogus;
-using Bogus.DataSets;
-using GM.DatabaseModel;
-using GM.ViewModels;
+using GM.Application.DTOs.Meetings;
 
-namespace FakeData
+namespace GM.Utilities.FakeData
 {
     //public class Section
     //{
@@ -23,17 +17,16 @@ namespace FakeData
         static void Main(string[] args)
         {
             Console.WriteLine("Hello World!");
+            string text;
 
             //FakeMeeting fm = new FakeMeeting();
-            //Meeting meeting = fm.GenerateMeeting();
-
-            //string text = Newtonsoft.Json.JsonConvert.SerializeObject(meeting, Newtonsoft.Json.Formatting.Indented);
-
+            //Meeting meeting = fm.GenerateFake();
+            //text = Newtonsoft.Json.JsonConvert.SerializeObject(meeting, Newtonsoft.Json.Formatting.Indented);
             //File.WriteAllText(@"c:\tmp\fakemeeting.json", text);
 
-            FakeTranscriptViewModel ft = new FakeTranscriptViewModel();
-            TranscriptViewModel tvm = ft.GenerateFake();
-            string text = Newtonsoft.Json.JsonConvert.SerializeObject(tvm, Newtonsoft.Json.Formatting.Indented);
+            FakeTranscriptViewDto ft = new FakeTranscriptViewDto();
+            ViewMeeting_Dto tvm = ft.GenerateFake();
+            text = Newtonsoft.Json.JsonConvert.SerializeObject(tvm, Newtonsoft.Json.Formatting.Indented);
             File.WriteAllText(@"c:\tmp\faketvm.json", text);
 
         }
